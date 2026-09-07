@@ -55,9 +55,9 @@ const mathInfo = {
   svm: {
     title: "SVM 마진(Margin) 및 하이퍼플레인",
     body: `
-      <p>SVM은 두 클래스 간의 최단 거리를 나타내는 **마진(Margin)**을 최대화하는 경계선을 찾습니다.</p>
+      <p>SVM은 두 클래스 간의 최단 거리를 나타내는 <b>마진(Margin)</b>을 최대화하는 경계선을 찾습니다.</p>
       <div class="math-formula">Hyperplane: wᵀx + b = 0 <br> Margin Width = 2 / ||w||</div>
-      <p>경계 영역 경선 상에 딱 걸쳐서 결정 경계의 위치를 결정하는 데이터 점들을 <b>서포트 벡터(Support Vector)</b>라고 부릅니다.</p>
+      <p>경계 영역 선상에 딱 걸쳐서 결정 경계의 위치를 결정하는 데이터 점들을 <b>서포트 벡터(Support Vector)</b>라고 부릅니다.</p>
     `
   }
 };
