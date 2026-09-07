@@ -14,11 +14,13 @@ const get = id => document.getElementById(id);
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 function renderCards() {
-  get('algorithm-cards').innerHTML = Object.entries(algorithms).map(([key, item], index) => `
-    <article class="algorithm-card" onclick="showConcept('${key}')">
-      <div><span class="card-number">0${index + 1} / ${item.kicker}</span><h2>${item.title}</h2><p>${item.summary}</p></div>
-      <span class="card-link">개념 카드 보기 -></span>
-    </article>`).join('');
+  const groups = [
+    { title: '예측', description: '연속적인 값을 예측하는 알고리즘', keys: ['linear'] },
+    { title: '분류', description: '데이터를 기준에 따라 나누는 알고리즘', keys: ['logistic', 'knn', 'tree', 'svm'] },
+    { title: '군집화', description: '비슷한 데이터끼리 묶는 알고리즘', keys: ['kmeans'] }
+  ];
+  let cardNumber = 0;
+  get('algorithm-cards').innerHTML = groups.map(group => `<section class="algorithm-group"><div class="group-heading"><div><span class="eyebrow">ALGORITHM GROUP</span><h2>${group.title}</h2></div><p>${group.description}</p></div><div class="algorithm-grid">${group.keys.map(key => { const item = algorithms[key]; cardNumber += 1; return `<article class="algorithm-card algorithm-card--${key}" onclick="showConcept('${key}')"><div><span class="card-number">0${cardNumber} / ${item.kicker}</span><h2>${item.title}</h2><p>${item.summary}</p></div><span class="card-link">개념 카드 보기 -></span></article>`; }).join('')}</div></section>`).join('');
 }
 
 function hidePages() { Object.values(pages).forEach(page => page.classList.add('hidden')); }
