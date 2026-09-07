@@ -3,318 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>지도학습 알고리즘 클래스 스튜디오</title>
+  <title>알고리즘 카드 스튜디오</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <main class="app-shell">
+    <section id="home-page" class="page">
+      <div class="hero-copy">
+        <span class="eyebrow">MACHINE LEARNING LAB</span>
+        <h1>알고리즘 카드 스튜디오</h1>
+        <p>카드뉴스로 개념을 읽고, 바로 옆 실험실에서 알고리즘의 변화를 직접 조작해보세요.</p>
+      </div>
+      <div id="algorithm-cards" class="algorithm-grid"></div>
+    </section>
 
-  <div class="container">
-
-    <!-- PAGE 1: HOME CARD NEWS -->
-    <div id="home-page" class="page">
-      <span class="tag">기계학습 알고리즘 가이드</span>
-      <h1>지도학습 알고리즘 실습 스튜디오</h1>
-      <p class="sub-text">
-        탐구하고 싶은 지도학습 알고리즘 카드를 선택하여 직접 조작하고 수학 원리를 파악해보세요.
-      </p>
-
-      <div class="card-grid">
-        <div class="news-card reg-card" onclick="openSim('regression')">
-          <span class="card-badge" style="color:#2563eb; background:#eff6ff;">회귀 (Regression)</span>
-          <h3>1. 선형 회귀 & 이상치</h3>
-          <p>이상치 점의 위치와 가중치가 회귀선(최소제곱법) 기울기에 미치는 영향을 관찰합니다.</p>
-          <div class="card-btn" style="color:#2563eb;">이상치 시뮬레이션 🚀</div>
+    <section id="concept-page" class="page hidden">
+      <button class="text-button" onclick="goHome()">← 전체 카드</button>
+      <div class="concept-layout">
+        <div class="concept-intro">
+          <span id="concept-kicker" class="eyebrow"></span>
+          <h2 id="concept-title"></h2>
+          <p id="concept-summary"></p>
+          <button class="primary-button" onclick="openCurrentSimulator()">시뮬레이터로 이동 →</button>
         </div>
-
-        <div class="news-card knn-card" onclick="openSim('knn')">
-          <span class="card-badge" style="color:#059669; background:#ecfdf5;">분류 (Classification)</span>
-          <h3>2. K-NN (최근접 이웃)</h3>
-          <p>이웃의 수(K)에 따른 다수결 채택 과정 및 결정 경계(Decision Boundary)의 변화를 확인합니다.</p>
-          <div class="card-btn" style="color:#059669;">다중 그룹 시뮬레이션 🚀</div>
-        </div>
-
-        <div class="news-card dt-card" onclick="openSim('dt')">
-          <span class="card-badge" style="color:#7c3aed; background:#f5f3ff;">분류/회귀</span>
-          <h3>3. 결정 트리 (Decision Tree)</h3>
-          <p>지니 불순도를 낮추는 동적 영역 분할과 트리의 깊이(Depth)에 따른 분류 모델 구조를 관찰합니다.</p>
-          <div class="card-btn" style="color:#7c3aed;">영역 분할 시뮬레이션 🚀</div>
-        </div>
-
-        <div class="news-card svm-card" onclick="openSim('svm')">
-          <span class="card-badge" style="color:#d97706; background:#fffbe8;">분류 (Classification)</span>
-          <h3>4. 서포트 벡터 머신 (SVM)</h3>
-          <p>마진 폭(Margin)을 최대화하는 최적 경계선 및 서포트 벡터의 역할을 직접 실습합니다.</p>
-          <div class="card-btn" style="color:#d97706;">마진 최적화 시뮬레이션 🚀</div>
+        <div class="concept-sections">
+          <article><span>01</span><h3>핵심 개념</h3><p id="concept-core"></p></article>
+          <article><span>02</span><h3>무엇을 조작하나요?</h3><p id="concept-controls"></p></article>
+          <article><span>03</span><h3>관찰 포인트</h3><p id="concept-observe"></p></article>
         </div>
       </div>
-    </div>
+    </section>
 
-
-    <!-- PAGE 2: REGRESSION SIMULATOR -->
-    <div id="sim-regression-page" class="page hidden">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <span class="tag">회귀 실습</span>
-          <h2 style="font-size: 1.4rem; margin-top:2px;">선형 회귀와 이상치(Outlier)</h2>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn btn-math" onclick="showMathModal('regression')">💡 수학 원리</button>
-          <button class="btn btn-secondary" onclick="resetRegSim()">🔄 초기화</button>
-          <button class="btn btn-secondary" onclick="goHome()">메인 메뉴</button>
-        </div>
+    <section id="simulator-page" class="page hidden">
+      <div class="sim-header">
+        <div><button class="text-button" onclick="showConcept(currentAlgorithm)">← 개념으로 돌아가기</button><span id="sim-kicker" class="eyebrow"></span><h2 id="sim-title"></h2></div>
+        <button class="secondary-button" onclick="goHome()">전체 카드</button>
       </div>
-
-      <div class="control-panel">
-        <div class="control-group">
-          <div class="control-label">
-            <span>🎲 데이터 분포</span>
-            <span class="control-value" id="reg-type-display">선형 경향</span>
-          </div>
-          <select id="reg-type-select" aria-label="데이터 분포 선택" style="padding: 6px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; font-size: 0.85rem;">
-            <option value="correlated" selected>선형 경향 (예측 용이)</option>
-            <option value="random">무작위 산점 (경향 없음)</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <div class="control-label">
-            <span>📊 데이터 개수</span>
-            <span class="control-value" id="reg-count-display">15 개</span>
-          </div>
-          <input type="range" id="reg-count-slider" aria-label="회귀 데이터 개수" min="5" max="50" value="15">
-        </div>
-
-        <div class="control-group">
-          <div class="control-label">
-            <span>⚖️ 이상치 가중치</span>
-            <span class="control-value" id="reg-weight-display" style="color:#ef4444; background:#fef2f2;">1.0 배</span>
-          </div>
-          <input type="range" id="reg-weight-slider" aria-label="이상치 가중치" min="1" max="10" value="1" step="0.5">
-        </div>
-      </div>
-
-      <div class="canvas-container"><canvas id="regCanvas" aria-label="이상치가 포함된 회귀선 시뮬레이션"></canvas></div>
-
-      <div class="info-panel">
-        <div class="info-item">
-          <div class="label">최소제곱 회귀방정식</div>
-          <div class="value" id="reg-eq-val" style="color:#60a5fa;">y = 0x + 0</div>
-        </div>
-        <div class="info-item">
-          <div class="label">기울기 변형 비율</div>
-          <div class="value" id="reg-slope-val" style="color:#f59e0b;">0%</div>
-        </div>
-        <div class="info-item">
-          <div class="label">이상치 상태</div>
-          <div class="value" id="reg-status-val" style="color:#34d399;">안정적</div>
-        </div>
-      </div>
-
-      <!-- Guided Mission -->
-      <div class="mission-card">
-        <div class="mission-title">🎯 수업 탐구 미션</div>
-        <ul class="mission-list">
-          <li class="mission-item"><input type="checkbox" aria-label="회귀 미션 1 완료"><span>1. 빨간색 이상치를 캔버스 오른쪽 맨 위로 드래그했을 때, 회귀선(파란선)의 기울기가 어떻게 변하는지 확인하기</span></li>
-          <li class="mission-item"><input type="checkbox" aria-label="회귀 미션 2 완료"><span>2. 이상치 가중치를 10배로 늘렸을 때, 기울기 변형 비율이 100% 이상을 넘어가며 회귀선이 완전 붕괴하는 모습 관찰하기</span></li>
-        </ul>
-      </div>
-    </div>
-
-
-    <!-- PAGE 3: K-NN SIMULATOR -->
-    <div id="sim-knn-page" class="page hidden">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <span class="tag" style="background:#ecfdf5; color:#047857;">분류 실습</span>
-          <h2 style="font-size: 1.4rem; margin-top:2px;">K-NN 다중 그룹 분류</h2>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn btn-math" onclick="showMathModal('knn')">💡 수학 원리</button>
-          <button class="btn btn-secondary" onclick="resetKnnSim()">🔄 초기화</button>
-          <button class="btn btn-secondary" onclick="goHome()">메인 메뉴</button>
-        </div>
-      </div>
-
-      <div class="control-panel">
-        <div class="control-group">
-          <div class="control-label">
-            <span>🔍 이웃 수 (K)</span>
-            <span class="control-value" id="knn-k-display" style="color:#059669; background:#ecfdf5;">K = 3</span>
-          </div>
-          <input type="range" id="knn-k-slider" aria-label="K 이웃 수" min="1" max="15" value="3" step="2">
-        </div>
-
-        <div class="control-group">
-          <div class="control-label">
-            <span>🎨 그룹 수</span>
-            <span class="control-value" id="knn-groups-display" style="color:#059669; background:#ecfdf5;">2 개</span>
-          </div>
-          <input type="range" id="knn-groups-slider" aria-label="K-NN 그룹 수" min="2" max="4" value="2" step="1">
-        </div>
-
-        <div class="control-group">
-          <div class="control-label">
-            <span>📌 그룹당 샘플 수</span>
-            <span class="control-value" id="knn-count-display" style="color:#059669; background:#ecfdf5;">12 개</span>
-          </div>
-          <input type="range" id="knn-count-slider" aria-label="그룹당 K-NN 샘플 수" min="5" max="30" value="12" step="1">
-        </div>
-      </div>
-
-      <div class="canvas-container"><canvas id="knnCanvas" aria-label="K-NN 결정 경계와 분류 대상 시뮬레이션"></canvas></div>
-
-      <div class="info-panel">
-        <div class="info-item">
-          <div class="label">설정 상태</div>
-          <div class="value" id="knn-hud-k" style="color:#34d399;">K=3 / 2개 그룹</div>
-        </div>
-        <div class="info-item">
-          <div class="label">최종 다수결 분류 결과</div>
-          <div class="value" id="knn-hud-result" style="color:#60a5fa;">-</div>
-        </div>
-      </div>
-
-      <!-- Guided Mission -->
-      <div class="mission-card">
-        <div class="mission-title">🎯 수업 탐구 미션</div>
-        <ul class="mission-list">
-          <li class="mission-item"><input type="checkbox" aria-label="K-NN 미션 1 완료"><span>1. K=1 일 때와 K=15 일 때 캔버스 결정 영역(Decision Boundary)의 매끄러움 차이 비교하기</span></li>
-          <li class="mission-item"><input type="checkbox" aria-label="K-NN 미션 2 완료"><span>2. 보라색 타겟 점을 빨간색과 파란색 점의 경계면에 올려두고 K값을 변경하면서 결과가 바뀌는지 관찰하기</span></li>
-        </ul>
-      </div>
-    </div>
-
-
-    <!-- PAGE 4: DECISION TREE SIMULATOR -->
-    <div id="sim-dt-page" class="page hidden">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <span class="tag" style="background:#f5f3ff; color:#6b21a8;">분류/회귀 실습</span>
-          <h2 style="font-size: 1.4rem; margin-top:2px;">결정 트리 영역 분할 실험실</h2>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn btn-math" onclick="showMathModal('dt')">💡 수학 원리</button>
-          <button class="btn btn-secondary" onclick="resetDtSim()">🔄 초기화</button>
-          <button class="btn btn-secondary" onclick="goHome()">메인 메뉴</button>
-        </div>
-      </div>
-
-      <div class="control-panel">
-        <div class="control-group">
-          <div class="control-label">
-            <span>🌳 최대 트리 깊이 (Max Depth)</span>
-            <span class="control-value" id="dt-depth-display" style="color:#7c3aed; background:#f5f3ff;">Depth = 2</span>
-          </div>
-          <input type="range" id="dt-depth-slider" aria-label="결정 트리 최대 깊이" min="1" max="3" value="2" step="1">
-        </div>
-        <div class="control-group">
-          <div class="control-label">
-            <span>🎲 데이터 재생성</span>
-            <button class="btn" style="padding:4px 12px; font-size:0.8rem;" onclick="generateDtData()">샘플 섞기</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="canvas-container"><canvas id="dtCanvas" aria-label="결정 트리 영역 분할 시뮬레이션"></canvas></div>
-
-      <!-- Decision Tree Node Structural Diagram -->
-      <div class="tree-diagram-container">
-        <span style="font-size:0.85rem; font-weight:700; color:#475569;">🌳 현재 결정 트리 분할 노드 구조도</span>
-        <div class="tree-nodes-wrapper" id="tree-nodes-display"></div>
-      </div>
-
-      <div class="info-panel">
-        <div class="info-item">
-          <div class="label">현재 분할 질문 개수</div>
-          <div class="value" id="dt-hud-splits" style="color:#c084fc;">3 개의 경계선</div>
-        </div>
-        <div class="info-item">
-          <div class="label">모델 상태</div>
-          <div class="value" id="dt-hud-status" style="color:#34d399;">적정 분할</div>
-        </div>
-      </div>
-
-      <!-- Guided Mission -->
-      <div class="mission-card">
-        <div class="mission-title">🎯 수업 탐구 미션</div>
-        <ul class="mission-list">
-          <li class="mission-item"><input type="checkbox" aria-label="결정 트리 미션 1 완료"><span>1. Depth를 1에서 3으로 올려가며 캔버스 영역 분할선이 어떻게 늘어나는지 확인하기</span></li>
-          <li class="mission-item"><input type="checkbox" aria-label="결정 트리 미션 2 완료"><span>2. Depth=3일 때 하단 모델 상태가 '과대적합(Overfitting) 위험'으로 변하는 이유 토의해보기</span></li>
-        </ul>
-      </div>
-    </div>
-
-
-    <!-- PAGE 5: SVM SIMULATOR -->
-    <div id="sim-svm-page" class="page hidden">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div>
-          <span class="tag" style="background:#fffbe8; color:#b45309;">분류 실습</span>
-          <h2 style="font-size: 1.4rem; margin-top:2px;">서포트 벡터 머신 (SVM)</h2>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn btn-math" onclick="showMathModal('svm')">💡 수학 원리</button>
-          <button class="btn btn-secondary" onclick="resetSvmSim()">🔄 초기화</button>
-          <button class="btn btn-secondary" onclick="goHome()">메인 메뉴</button>
-        </div>
-      </div>
-
-      <div class="control-panel">
-        <div class="control-group">
-          <div class="control-label">
-            <span>📐 마진 폭 (Margin Width)</span>
-            <span class="control-value" id="svm-margin-display" style="color:#d97706; background:#fffbe8;">40px</span>
-          </div>
-          <input type="range" id="svm-margin-slider" aria-label="SVM 마진 폭" min="20" max="80" value="40" step="2">
-        </div>
-        <div class="control-group">
-          <div class="control-label">
-            <span>🔄 경계선 기울기</span>
-            <span class="control-value" id="svm-angle-display" style="color:#d97706; background:#fffbe8;">-0.5</span>
-          </div>
-          <input type="range" id="svm-angle-slider" aria-label="SVM 경계선 기울기" min="-2" max="2" value="-0.5" step="0.1">
-        </div>
-      </div>
-
-      <div class="canvas-container"><canvas id="svmCanvas" aria-label="SVM 마진과 서포트 벡터 시뮬레이션"></canvas></div>
-
-      <div class="info-panel">
-        <div class="info-item">
-          <div class="label">감지된 서포트 벡터 수</div>
-          <div class="value" id="svm-hud-sv" style="color:#fbbf24;">0 개</div>
-        </div>
-        <div class="info-item">
-          <div class="label">클래스 침범(오류) 점</div>
-          <div class="value" id="svm-hud-errors" style="color:#34d399;">0 개</div>
-        </div>
-      </div>
-
-      <!-- Guided Mission -->
-      <div class="mission-card">
-        <div class="mission-title">🎯 수업 탐구 미션</div>
-        <ul class="mission-list">
-          <li class="mission-item"><input type="checkbox" aria-label="SVM 미션 1 완료"><span>1. 파란 점 중 하나를 점선 영역 안으로 드래그해 노란색 테두리(서포트 벡터)로 지정되는 순간 관찰하기</span></li>
-          <li class="mission-item"><input type="checkbox" aria-label="SVM 미션 2 완료"><span>2. 기울기를 조절하여 점이 점선을 넘어가 침범 오차가 발생하는 조건 만들어보기</span></li>
-        </ul>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Shared Math Concept Modal -->
-  <div id="mathModal" class="modal-backdrop hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-title" style="font-size:1.2rem; color:#0f172a;">수학 원리</h3>
-        <button onclick="closeMathModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-      </div>
-      <div class="modal-body" id="modal-body-text">
-        <!-- Content injected dynamically -->
-      </div>
-      <button class="btn" onclick="closeMathModal()" style="width:100%; margin-top:10px;">확인 및 닫기</button>
-    </div>
-  </div>
-
+      <div id="simulator-content"></div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
   <script src="script.js"></script>
 </body>
 </html>
