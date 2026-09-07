@@ -49,15 +49,19 @@ function openSimulator(type, data = '') {
 }
 
 function control(label, output, input) { return `<div class="control"><label>${label} <output id="${output}"></output></label><input id="${input}" type="range"></div>`; }
-function dataEntry(type, placeholder) { return `<div class="data-entry"><label for="${type}-data-input">직접 데이터 입력</label><textarea id="${type}-data-input" placeholder="${placeholder}"></textarea><div class="data-actions"><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div></div>`; }
+function dataEntry(type, needsLabel) {
+  const labelHeader = needsLabel ? '<th>그룹</th>' : '';
+  const rows = Array.from({ length: 4 }, () => `<tr class="data-row"><td><input data-field="x" type="number" min="0" max="100" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="100" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}</tr>`).join('');
+  return `<div class="data-entry"><label>직접 데이터 입력 <span>(0~100)</span></label><div class="data-table-wrap"><table><thead><tr><th>X</th><th>Y</th>${labelHeader}</tr></thead><tbody id="${type}-data-rows">${rows}</tbody></table></div><div class="data-actions"><button class="action-button" onclick="addDataRow('${type}', ${needsLabel})">행 추가</button><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div></div>`;
+}
 function simulatorTemplate(type) {
   const controls = {
-    linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', '예: 10,20\n30,45\n60,70')}<button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
-    logistic: `${control('기울기', 'logistic-slope-value', 'logistic-slope')}${control('절편', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준', 'logistic-threshold-value', 'logistic-threshold')}${dataEntry('logistic', '예: 20,30,0\n70,60,1')}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
-    knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}${dataEntry('knn', '예: 20,30,0\n70,60,1')}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
-    kmeans: `${control('클러스터 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}${dataEntry('kmeans', '예: 20,30\n70,60')}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
-    tree: `${control('최대 깊이', 'tree-depth-value', 'tree-depth')}${dataEntry('tree', '예: 20,30,0\n70,60,1')}<button class="action-button" onclick="resetTree()">샘플 재생성</button>`,
-    svm: `${control('마진 폭', 'svm-margin-value', 'svm-margin')}${control('경계 기울기', 'svm-angle-value', 'svm-angle')}${dataEntry('svm', '예: 20,30,1\n70,60,-1')}<button class="action-button" onclick="resetSvm()">점 초기화</button>`
+    linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', false)}<button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
+    logistic: `${control('기울기', 'logistic-slope-value', 'logistic-slope')}${control('절편', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준', 'logistic-threshold-value', 'logistic-threshold')}${dataEntry('logistic', true)}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
+    knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}${dataEntry('knn', true)}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
+    kmeans: `${control('클러스터 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}${dataEntry('kmeans', false)}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
+    tree: `${control('최대 깊이', 'tree-depth-value', 'tree-depth')}${dataEntry('tree', true)}<button class="action-button" onclick="resetTree()">샘플 재생성</button>`,
+    svm: `${control('마진 폭', 'svm-margin-value', 'svm-margin')}${control('경계 기울기', 'svm-angle-value', 'svm-angle')}${dataEntry('svm', true)}<button class="action-button" onclick="resetSvm()">점 초기화</button>`
   }[type];
   const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['가장 가까운 이웃|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], tree: ['트리 깊이|tree-depth-result', '분할선 수|tree-splits', '평균 지니|tree-gini'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
   const metricHtml = metrics.map(value => { const [label, id] = value.split('|'); return `<div class="metric"><small>${label}</small><strong id="${id}">-</strong></div>`; }).join('');
@@ -76,15 +80,15 @@ function configureSlider(id, min, max, value, step, output, formatter, callback)
   input.addEventListener('input', update); update();
 }
 function parseInput(type, width, height, needsLabel) {
-  const input = get(`${type}-data-input`);
-  const text = input ? input.value.trim() : '';
-  if (!text) return null;
-  const rows = text.split(/\n|;/).map(row => row.trim()).filter(Boolean);
-  const parsed = rows.map(row => row.split(/[,\s]+/).map(Number)).filter(values => values.length >= (needsLabel ? 3 : 2) && values.slice(0, needsLabel ? 3 : 2).every(Number.isFinite));
-  if (parsed.length < 2 || (needsLabel && parsed.some(values => !Number.isFinite(values[2])))) { showToast('입력 형식이 올바르지 않습니다.'); return null; }
-  return parsed.map(values => ({ x: clamp(values[0], 0, 100) / 100 * width, y: clamp(values[1], 0, 100) / 100 * height, ...(needsLabel ? { label: values[2] > 0 ? 1 : 0, group: Math.max(0, Math.round(values[2])) } : {}) }));
+  const rows = [...document.querySelectorAll(`#${type}-data-rows .data-row`)].map(row => [...row.querySelectorAll('input')].map(input => input.value.trim() === '' ? null : Number(input.value)));
+  const filled = rows.filter(values => values.some(value => value !== null));
+  if (!filled.length) return null;
+  const valid = filled.filter(values => Number.isFinite(values[0]) && Number.isFinite(values[1]) && (!needsLabel || Number.isFinite(values[2])));
+  if (valid.length !== filled.length || valid.length < 2) { showToast('X, Y와 필요한 그룹 값을 모두 입력하세요.'); return null; }
+  return valid.map(values => ({ x: clamp(values[0], 0, 100) / 100 * width, y: clamp(values[1], 0, 100) / 100 * height, ...(needsLabel ? { label: values[2] > 0 ? 1 : 0, group: Math.max(0, Math.round(values[2])) } : {}) }));
 }
-function applyInput(type) { const input = get(`${type}-data-input`); const data = input ? input.value : ''; if (!data.trim()) { showToast('입력할 데이터를 먼저 작성하세요.'); return; } openSimulator(type, data); }
+function addDataRow(type, needsLabel) { const row = document.createElement('tr'); row.className = 'data-row'; row.innerHTML = `<td><input data-field="x" type="number" min="0" max="100" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="100" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}`; get(`${type}-data-rows`).appendChild(row); }
+function applyInput(type) { const data = parseInput(type, 100, 100, ['logistic', 'knn', 'tree', 'svm'].includes(type)); if (!data) { showToast('입력할 데이터를 먼저 작성하세요.'); return; } startSimulation(type); }
 function randomizeData(type) { openSimulator(type); }
 function showToast(message) { const toast = get('toast'); toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }
 function drawGrid(ctx, width, height) { ctx.strokeStyle = '#e5e1d8'; ctx.lineWidth = 1; for (let x = 0; x <= width; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); } for (let y = 0; y <= height; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); } }
