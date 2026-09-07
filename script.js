@@ -1,9 +1,10 @@
 const algorithms = {
-  linear: { title: '선형 회귀', kicker: 'REGRESSION', summary: '연속적인 값을 가장 잘 설명하는 직선을 찾아 예측합니다.', core: '입력값과 목표값의 관계를 y = wx + b 형태의 직선으로 근사합니다. 오차 제곱의 합이 가장 작아지는 기울기와 절편을 찾습니다.', controls: '데이터 개수, 잡음 정도, 데이터 점의 위치를 조절할 수 있습니다.', observe: '점 하나의 위치가 회귀선과 평균제곱오차에 어떤 영향을 주는지 확인하세요.' },
-  logistic: { title: '로지스틱 회귀', kicker: 'CLASSIFICATION', summary: '확률을 계산해 두 클래스 중 어디에 속하는지 분류합니다.', core: '선형 결합값을 시그모이드 함수에 넣어 0과 1 사이의 확률로 변환하고 기준 확률에 따라 클래스를 결정합니다.', controls: '기울기, 절편, 분류 기준값을 조절하고 데이터 점을 이동할 수 있습니다.', observe: '결정 경계와 기준값이 바뀌면 분류 결과가 어떻게 달라지는지 확인하세요.' },
-  knn: { title: 'K-최근접 이웃', kicker: 'CLASSIFICATION', summary: '새로운 점 주변의 가까운 이웃을 보고 다수결로 분류합니다.', core: '새 점과 학습 데이터 사이의 거리를 계산한 뒤 가장 가까운 K개의 클래스 중 다수인 클래스를 선택합니다.', controls: 'K, 그룹 수, 그룹별 샘플 수를 조절하고 보라색 대상 점을 드래그할 수 있습니다.', observe: 'K가 작을 때와 클 때 결정 영역과 분류 결과가 어떻게 달라지는지 비교하세요.' },
-  kmeans: { title: 'K-평균', kicker: 'CLUSTERING', summary: '정답 라벨 없이 비슷한 데이터끼리 K개의 그룹으로 묶습니다.', core: '각 점을 가장 가까운 중심에 할당하고 각 그룹의 평균 위치로 중심을 이동하는 과정을 반복합니다.', controls: '클러스터 수와 데이터 개수를 조절하고 한 단계씩 학습을 진행할 수 있습니다.', observe: '중심이 이동하고 그룹 색상이 안정되는 과정을 확인하세요.' },
-  svm: { title: '서포트 벡터 머신', kicker: 'CLASSIFICATION', summary: '두 클래스 사이의 간격이 가장 넓어지는 경계면을 찾습니다.', core: '결정 경계와 가장 가까운 점인 서포트 벡터를 기준으로 마진을 최대화해 분류합니다.', controls: '마진 폭과 경계선 기울기를 조절하고 데이터 점을 직접 이동할 수 있습니다.', observe: '마진 안에 들어오는 점과 경계를 침범하는 점의 수가 어떻게 변하는지 확인하세요.' }
+  linear: { title: '선형 회귀', kicker: 'REGRESSION', summary: '연속적인 값을 가장 잘 설명하는 직선을 찾아 예측합니다.', core: '입력값과 목표값의 관계를 y = wx + b 형태의 직선으로 근사합니다. 오차 제곱의 합이 가장 작아지는 기울기와 절편을 찾습니다.', controls: '데이터 개수, 잡음 정도, 데이터 점의 위치를 조절할 수 있습니다.', observe: '점 하나의 위치가 회귀선과 평균제곱오차에 어떤 영향을 주는지 확인하세요.', formula: '공식은 MSE = 1/n Σ(yᵢ - ŷᵢ)²입니다. 가격, 온도, 수요처럼 연속적인 값을 예측할 때 활용합니다.' },
+  logistic: { title: '로지스틱 회귀', kicker: 'CLASSIFICATION', summary: '확률을 계산해 두 클래스 중 어디에 속하는지 분류합니다.', core: '선형 결합값을 시그모이드 함수에 넣어 0과 1 사이의 확률로 변환하고 기준 확률에 따라 클래스를 결정합니다.', controls: '기울기, 절편, 분류 기준값을 조절하고 데이터 점을 이동할 수 있습니다.', observe: '결정 경계와 기준값이 바뀌면 분류 결과가 어떻게 달라지는지 확인하세요.', formula: '확률은 σ(z) = 1/(1+e⁻ᶻ)로 계산합니다. 스팸 판별, 합격 여부, 질병 위험처럼 두 결과를 분류하는 데 사용합니다.' },
+  knn: { title: 'K-최근접 이웃', kicker: 'CLASSIFICATION', summary: '새로운 점 주변의 가까운 이웃을 보고 다수결로 분류합니다.', core: '새 점과 학습 데이터 사이의 거리를 계산한 뒤 가장 가까운 K개의 클래스 중 다수인 클래스를 선택합니다.', controls: 'K, 그룹 수, 그룹별 샘플 수를 조절하고 보라색 대상 점을 드래그할 수 있습니다.', observe: 'K가 작을 때와 클 때 결정 영역과 분류 결과가 어떻게 달라지는지 비교하세요.', formula: '거리는 d = √Σ(xᵢ-yᵢ)²로 계산합니다. 별도의 학습식 없이 데이터의 지역적 패턴을 이용하는 방식입니다.' },
+  kmeans: { title: 'K-평균', kicker: 'CLUSTERING', summary: '정답 라벨 없이 비슷한 데이터끼리 K개의 그룹으로 묶습니다.', core: '각 점을 가장 가까운 중심에 할당하고 각 그룹의 평균 위치로 중심을 이동하는 과정을 반복합니다.', controls: '클러스터 수와 데이터 개수를 조절하고 한 단계씩 학습을 진행할 수 있습니다.', observe: '중심이 이동하고 그룹 색상이 안정되는 과정을 확인하세요.', formula: '목표는 각 점과 소속 중심 사이 거리의 제곱합을 줄이는 것입니다. 고객 유형, 이미지 색상, 문서 주제 분류에 활용합니다.' },
+  tree: { title: '의사결정트리', kicker: 'CLASSIFICATION / REGRESSION', summary: '질문을 차례로 던져 데이터를 이해하기 쉬운 영역으로 나눕니다.', core: '특성의 기준값을 질문으로 사용해 데이터를 분할하고, 각 영역의 클래스가 최대한 순수해지도록 다음 질문을 선택합니다.', controls: '트리 깊이와 샘플 구성을 조절하고 지니 불순도 기반 분할선을 확인할 수 있습니다.', observe: '깊이가 커질수록 경계가 복잡해지고 과대적합 위험이 커지는 과정을 비교하세요.', formula: '지니 불순도는 Gini = 1 - Σpᵢ²입니다. 설명 가능한 규칙이 필요하거나 분류와 회귀를 함께 다룰 때 활용합니다.' },
+  svm: { title: '서포트 벡터 머신', kicker: 'CLASSIFICATION', summary: '두 클래스 사이의 간격이 가장 넓어지는 경계면을 찾습니다.', core: '결정 경계와 가장 가까운 점인 서포트 벡터를 기준으로 마진을 최대화해 분류합니다.', controls: '마진 폭과 경계선 기울기를 조절하고 데이터 점을 직접 이동할 수 있습니다.', observe: '마진 안에 들어오는 점과 경계를 침범하는 점의 수가 어떻게 변하는지 확인하세요.', formula: '경계는 wᵀx+b=0이고 마진 폭은 2/||w||입니다. 특성이 많은 데이터나 명확한 경계가 있는 분류에 활용합니다.' }
 };
 
 const pages = { home: document.querySelector('#home-page'), concept: document.querySelector('#concept-page'), simulator: document.querySelector('#simulator-page') };
@@ -32,6 +33,7 @@ function showConcept(type) {
   get('concept-core').textContent = item.core;
   get('concept-controls').textContent = item.controls;
   get('concept-observe').textContent = item.observe;
+  get('concept-formula').textContent = item.formula;
   hidePages(); pages.concept.classList.remove('hidden'); stopSimulation();
 }
 function openCurrentSimulator() { openSimulator(currentAlgorithm); }
@@ -52,9 +54,10 @@ function simulatorTemplate(type) {
     logistic: `${control('기울기', 'logistic-slope-value', 'logistic-slope')}${control('절편', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준', 'logistic-threshold-value', 'logistic-threshold')}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
     knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
     kmeans: `${control('클러스터 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
+    tree: `${control('최대 깊이', 'tree-depth-value', 'tree-depth')}<button class="action-button" onclick="resetTree()">샘플 재생성</button>`,
     svm: `${control('마진 폭', 'svm-margin-value', 'svm-margin')}${control('경계 기울기', 'svm-angle-value', 'svm-angle')}<button class="action-button" onclick="resetSvm()">점 초기화</button>`
   }[type];
-  const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['가장 가까운 이웃|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
+  const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['가장 가까운 이웃|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], tree: ['트리 깊이|tree-depth-result', '분할선 수|tree-splits', '평균 지니|tree-gini'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
   const metricHtml = metrics.map(value => { const [label, id] = value.split('|'); return `<div class="metric"><small>${label}</small><strong id="${id}">-</strong></div>`; }).join('');
   return `<div class="simulator-grid"><aside class="control-panel"><h3>실험 조절판</h3>${controls}</aside><section><div class="canvas-wrap"><canvas id="${type}-canvas" aria-label="${algorithms[type].title} 시뮬레이터"></canvas><div class="canvas-note">캔버스의 점을 드래그하며 변화를 관찰하세요.</div></div><div class="metrics">${metricHtml}</div></section></div>`;
 }
@@ -73,7 +76,7 @@ function configureSlider(id, min, max, value, step, output, formatter, callback)
 function drawGrid(ctx, width, height) { ctx.strokeStyle = '#e5e1d8'; ctx.lineWidth = 1; for (let x = 0; x <= width; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); } for (let y = 0; y <= height; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); } }
 function eventPoint(canvas, event) { const rect = canvas.getBoundingClientRect(); const source = event.touches ? event.touches[0] : event; return { x: clamp(source.clientX - rect.left, 8, rect.width - 8), y: clamp(source.clientY - rect.top, 8, rect.height - 8) }; }
 function draggable(canvas, points, draw, radius = 18) { let index = -1; const start = event => { const point = eventPoint(canvas, event); index = points.findIndex(item => Math.hypot(item.x - point.x, item.y - point.y) < radius); if (index >= 0) event.preventDefault(); }; const move = event => { if (index < 0) return; const point = eventPoint(canvas, event); points[index].x = point.x; points[index].y = point.y; draw(); }; canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); window.addEventListener('mouseup', () => { index = -1; }); window.addEventListener('touchend', () => { index = -1; }); }
-function startSimulation(type) { stopSimulation(); activeSimulation = type; ({ linear: initLinear, logistic: initLogistic, knn: initKnn, kmeans: initKmeans, svm: initSvm }[type])(); }
+function startSimulation(type) { stopSimulation(); activeSimulation = type; ({ linear: initLinear, logistic: initLogistic, knn: initKnn, kmeans: initKmeans, tree: initTree, svm: initSvm }[type])(); }
 
 function initLinear() {
   const sim = setupCanvas('linear-canvas'); const points = [];
@@ -102,6 +105,59 @@ function initKmeans() {
   const generate = () => { points.length = 0; centers.length = 0; const count = +get('kmeans-count').value; const clusterCount = +get('kmeans-k').value; for (let index = 0; index < count; index++) { const cluster = index % clusterCount; points.push({ x: sim.width * (.18 + cluster % 3 * .32) + (Math.random() - .5) * 100, y: sim.height * (.25 + Math.floor(cluster / 3) * .45) + (Math.random() - .5) * 90, cluster }); } for (let index = 0; index < clusterCount; index++) centers.push({ x: 50 + Math.random() * (sim.width - 100), y: 50 + Math.random() * (sim.height - 100) }); get('kmeans-step').textContent = '0'; get('kmeans-status').textContent = '초기화됨'; draw(); };
   window.stepKmeans = () => { points.forEach(point => { point.cluster = centers.reduce((best, center, index) => Math.hypot(center.x - point.x, center.y - point.y) < Math.hypot(centers[best].x - point.x, centers[best].y - point.y) ? index : best, 0); }); centers.forEach((center, index) => { const clusterPoints = points.filter(point => point.cluster === index); if (clusterPoints.length) { center.x = clusterPoints.reduce((sum, point) => sum + point.x, 0) / clusterPoints.length; center.y = clusterPoints.reduce((sum, point) => sum + point.y, 0) / clusterPoints.length; } }); get('kmeans-step').textContent = +get('kmeans-step').textContent + 1; get('kmeans-status').textContent = '중심 이동 완료'; draw(); };
   window.resetKmeans = generate; configureSlider('kmeans-k', 2, 5, 3, 1, 'kmeans-k-value', value => value, generate); configureSlider('kmeans-count', 12, 60, 30, 1, 'kmeans-count-value', value => value, generate); generate();
+}
+
+function initTree() {
+  const sim = setupCanvas('tree-canvas');
+  const points = [];
+  const colors = ['#3182f6', '#ff6b6b'];
+  const gini = items => {
+    if (!items.length) return 0;
+    const positive = items.filter(item => item.label === 1).length / items.length;
+    return 1 - positive ** 2 - (1 - positive) ** 2;
+  };
+  const bestSplit = (items, axis) => {
+    if (items.length < 2) return axis === 'x' ? sim.width / 2 : sim.height / 2;
+    const sorted = [...items].sort((a, b) => a[axis] - b[axis]);
+    let bestValue = sorted[Math.floor(sorted.length / 2)][axis];
+    let bestScore = Infinity;
+    for (let index = 0; index < sorted.length - 1; index++) {
+      const value = (sorted[index][axis] + sorted[index + 1][axis]) / 2;
+      const left = items.filter(item => item[axis] <= value);
+      const right = items.filter(item => item[axis] > value);
+      const score = left.length / items.length * gini(left) + right.length / items.length * gini(right);
+      if (score < bestScore) { bestScore = score; bestValue = value; }
+    }
+    return bestValue;
+  };
+  const draw = () => {
+    const depth = +get('tree-depth').value;
+    sim.ctx.clearRect(0, 0, sim.width, sim.height);
+    drawGrid(sim.ctx, sim.width, sim.height);
+    const rootX = bestSplit(points, 'x');
+    sim.ctx.strokeStyle = '#7357c8'; sim.ctx.lineWidth = 3;
+    sim.ctx.beginPath(); sim.ctx.moveTo(rootX, 0); sim.ctx.lineTo(rootX, sim.height); sim.ctx.stroke();
+    let splitCount = 1;
+    if (depth >= 2) {
+      const left = points.filter(point => point.x <= rootX);
+      const right = points.filter(point => point.x > rootX);
+      const leftY = bestSplit(left, 'y');
+      const rightY = bestSplit(right, 'y');
+      sim.ctx.strokeStyle = '#9b7be8'; sim.ctx.lineWidth = 2; sim.ctx.setLineDash([7, 5]);
+      sim.ctx.beginPath(); sim.ctx.moveTo(0, leftY); sim.ctx.lineTo(rootX, leftY); sim.ctx.stroke();
+      sim.ctx.beginPath(); sim.ctx.moveTo(rootX, rightY); sim.ctx.lineTo(sim.width, rightY); sim.ctx.stroke();
+      sim.ctx.setLineDash([]); splitCount = 3;
+    }
+    points.forEach(point => { sim.ctx.fillStyle = colors[point.label]; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 7, 0, Math.PI * 2); sim.ctx.fill(); });
+    get('tree-depth-result').textContent = `${depth}단계`;
+    get('tree-splits').textContent = `${splitCount}개`;
+    get('tree-gini').textContent = gini(points).toFixed(2);
+  };
+  const generate = () => { points.length = 0; for (let index = 0; index < 36; index++) { const x = 30 + Math.random() * (sim.width - 60); const y = 30 + Math.random() * (sim.height - 60); points.push({ x, y, label: (x > sim.width * .52 && y < sim.height * .62) || (x < sim.width * .34 && y > sim.height * .56) ? 1 : 0 }); } draw(); };
+  window.resetTree = generate;
+  configureSlider('tree-depth', 1, 2, 2, 1, 'tree-depth-value', value => value, draw);
+  draggable(sim.canvas, points, draw);
+  generate();
 }
 
 function initSvm() {
