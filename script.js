@@ -105,7 +105,7 @@ function startSimulation(type) { stopSimulation(); activeSimulation = type; ({ l
 
 function initLinear() {
   const sim = setupCanvas('linear-canvas'); const points = [];
-  const plot = { left: 46, top: 20, right: sim.width - 18, bottom: sim.height - 26 };
+  const plot = { left: 52, top: 18, right: sim.width - 18, bottom: sim.height - 30 };
   plot.width = plot.right - plot.left;
   plot.height = plot.bottom - plot.top;
   const toDataPoint = point => ({ x: ((point.x - plot.left) / plot.width) * 10, y: ((plot.bottom - point.y) / plot.height) * 10 });
@@ -114,6 +114,8 @@ function initLinear() {
     sim.ctx.lineWidth = 1;
     sim.ctx.font = '12px sans-serif';
     sim.ctx.fillStyle = '#6b7684';
+    sim.ctx.textAlign = 'center';
+    sim.ctx.textBaseline = 'middle';
     for (let index = 0; index <= 10; index++) {
       const x = plot.left + (index / 10) * plot.width;
       const y = plot.bottom - (index / 10) * plot.height;
@@ -121,10 +123,10 @@ function initLinear() {
       sim.ctx.moveTo(x, plot.top);
       sim.ctx.lineTo(x, plot.bottom);
       sim.ctx.stroke();
-      sim.ctx.textAlign = 'center';
-      sim.ctx.fillText(index, x, sim.height - 8);
+      sim.ctx.fillText(index, x, sim.height - 14);
       sim.ctx.textAlign = 'right';
-      sim.ctx.fillText(index, plot.left - 8, y + 4);
+      sim.ctx.fillText(index, plot.left - 10, y + 2);
+      sim.ctx.textAlign = 'center';
     }
     sim.ctx.strokeStyle = '#9aa4b2';
     sim.ctx.lineWidth = 1.5;
@@ -133,6 +135,11 @@ function initLinear() {
     sim.ctx.lineTo(plot.left, plot.bottom);
     sim.ctx.lineTo(plot.right, plot.bottom);
     sim.ctx.stroke();
+    sim.ctx.fillStyle = '#4b5563';
+    sim.ctx.textAlign = 'center';
+    sim.ctx.fillText('X', plot.right - 10, sim.height - 6);
+    sim.ctx.textAlign = 'center';
+    sim.ctx.fillText('Y', 18, plot.top + 8);
   };
   const draw = () => {
     sim.ctx.clearRect(0, 0, sim.width, sim.height); drawLinearGrid();
