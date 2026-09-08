@@ -52,9 +52,10 @@ function openSimulator(type, data = '') {
 
 function control(label, output, input) { return `<div class="control"><label>${label} <output id="${output}"></output></label><input id="${input}" type="range"></div>`; }
 function dataEntry(type, needsLabel) {
+  const coordinateMax = type === 'linear' ? 10 : 100;
   const labelHeader = needsLabel ? '<th>그룹</th>' : '';
-  const rows = Array.from({ length: 4 }, () => `<tr class="data-row"><td><input data-field="x" type="number" min="0" max="100" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="100" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}</tr>`).join('');
-  return `<div class="data-entry"><label>직접 데이터 입력 <span>(0~100)</span></label><div class="data-table-wrap"><table><thead><tr><th>X</th><th>Y</th>${labelHeader}</tr></thead><tbody id="${type}-data-rows">${rows}</tbody></table></div><div class="data-actions"><button class="action-button" onclick="addDataRow('${type}', ${needsLabel})">행 추가</button><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div></div>`;
+  const rows = Array.from({ length: 4 }, () => `<tr class="data-row"><td><input data-field="x" type="number" min="0" max="${coordinateMax}" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="${coordinateMax}" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}</tr>`).join('');
+  return `<div class="data-entry"><label>직접 데이터 입력 <span>X, Y 입력 범위: 0~${coordinateMax}</span></label><div class="data-table-wrap"><table><thead><tr><th>X</th><th>Y</th>${labelHeader}</tr></thead><tbody id="${type}-data-rows">${rows}</tbody></table></div><div class="data-actions"><button class="action-button" onclick="addDataRow('${type}', ${needsLabel})">행 추가</button><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div></div>`;
 }
 function simulatorTemplate(type) {
   const controls = {
@@ -82,14 +83,15 @@ function configureSlider(id, min, max, value, step, output, formatter, callback)
   input.addEventListener('input', update); update();
 }
 function parseInput(type, width, height, needsLabel) {
+  const coordinateMax = type === 'linear' ? 10 : 100;
   const rows = [...document.querySelectorAll(`#${type}-data-rows .data-row`)].map(row => [...row.querySelectorAll('input')].map(input => input.value.trim() === '' ? null : Number(input.value)));
   const filled = rows.filter(values => values.some(value => value !== null));
   if (!filled.length) return null;
   const valid = filled.filter(values => Number.isFinite(values[0]) && Number.isFinite(values[1]) && (!needsLabel || Number.isFinite(values[2])));
   if (valid.length !== filled.length || valid.length < 2) { showToast('X, Y와 필요한 그룹 값을 모두 입력하세요.'); return null; }
-  return valid.map(values => ({ x: clamp(values[0], 0, 100) / 100 * width, y: clamp(values[1], 0, 100) / 100 * height, ...(needsLabel ? { label: values[2] > 0 ? 1 : 0, group: Math.max(0, Math.round(values[2])) } : {}) }));
+  return valid.map(values => ({ x: clamp(values[0], 0, coordinateMax) / coordinateMax * width, y: clamp(values[1], 0, coordinateMax) / coordinateMax * height, ...(needsLabel ? { label: values[2] > 0 ? 1 : 0, group: Math.max(0, Math.round(values[2])) } : {}) }));
 }
-function addDataRow(type, needsLabel) { const row = document.createElement('tr'); row.className = 'data-row'; row.innerHTML = `<td><input data-field="x" type="number" min="0" max="100" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="100" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}`; get(`${type}-data-rows`).appendChild(row); }
+function addDataRow(type, needsLabel) { const coordinateMax = type === 'linear' ? 10 : 100; const row = document.createElement('tr'); row.className = 'data-row'; row.innerHTML = `<td><input data-field="x" type="number" min="0" max="${coordinateMax}" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="${coordinateMax}" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}`; get(`${type}-data-rows`).appendChild(row); }
 function applyInput(type) { const data = parseInput(type, 100, 100, ['logistic', 'knn', 'tree', 'svm'].includes(type)); if (!data) { showToast('입력할 데이터를 먼저 작성하세요.'); return; } startSimulation(type); }
 function randomizeData(type) { openSimulator(type); }
 function showToast(message) { const toast = get('toast'); toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }
