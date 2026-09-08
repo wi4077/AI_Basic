@@ -59,7 +59,7 @@ function dataEntry(type, needsLabel) {
 }
 function simulatorTemplate(type) {
   const controls = {
-    linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', false)}<button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
+    linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', false)}<div class="prediction-control"><label for="linear-predict">예측할 X</label><input id="linear-predict" type="number" min="0" max="10" step="0.1" value="5"><strong id="linear-prediction">-</strong></div><button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
     logistic: `${control('기울기', 'logistic-slope-value', 'logistic-slope')}${control('절편', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준', 'logistic-threshold-value', 'logistic-threshold')}${dataEntry('logistic', true)}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
     knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}${dataEntry('knn', true)}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
     kmeans: `${control('클러스터 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}${dataEntry('kmeans', false)}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
@@ -68,7 +68,7 @@ function simulatorTemplate(type) {
   }[type];
   const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['가장 가까운 이웃|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], tree: ['트리 깊이|tree-depth-result', '분할선 수|tree-splits', '평균 지니|tree-gini'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
   const metricHtml = metrics.map(value => { const [label, id] = value.split('|'); return `<div class="metric"><small>${label}</small><strong id="${id}">-</strong></div>`; }).join('');
-  return `<div class="simulator-grid"><aside class="control-panel"><h3>실험 조절판</h3>${controls}</aside><section><div class="canvas-wrap"><canvas id="${type}-canvas" aria-label="${algorithms[type].title} 시뮬레이터"></canvas><div class="canvas-note">캔버스의 점을 드래그하며 변화를 관찰하세요.</div></div><div class="metrics">${metricHtml}</div></section></div>`;
+  return `<div class="simulator-grid"><aside class="control-panel"><h3>실험 조절판</h3>${controls}</aside><section><div class="canvas-wrap"><canvas id="${type}-canvas" aria-label="${algorithms[type].title} 시뮬레이터"></canvas><div class="canvas-note">캔버스의 점을 드래그하며 변화를 관찰하세요.</div></div><div class="metrics">${metricHtml}</div><div id="${type}-learning" class="learning-panel"></div></section></div>`;
 }
 
 function setupCanvas(id) {
@@ -102,19 +102,20 @@ function startSimulation(type) { stopSimulation(); activeSimulation = type; ({ l
 
 function initLinear() {
   const sim = setupCanvas('linear-canvas'); const points = [];
+  const drawLinearGrid = () => { drawGrid(sim.ctx, sim.width, sim.height); sim.ctx.fillStyle = '#6b7684'; sim.ctx.font = '12px sans-serif'; for (let index = 0; index <= 10; index++) { const x = index / 10 * sim.width; const y = sim.height - index / 10 * sim.height; sim.ctx.fillText(index, Math.min(x + 4, sim.width - 18), sim.height - 8); sim.ctx.fillText(index, 8, Math.max(y - 4, 14)); } };
   const draw = () => {
-    sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height);
+    sim.ctx.clearRect(0, 0, sim.width, sim.height); drawLinearGrid();
     const dataPoints = points.map(point => ({ x: point.x / sim.width * 10, y: (sim.height - point.y) / sim.height * 10 }));
     const count = dataPoints.length; const meanX = dataPoints.reduce((sum, point) => sum + point.x, 0) / count; const meanY = dataPoints.reduce((sum, point) => sum + point.y, 0) / count;
     const denominator = dataPoints.reduce((sum, point) => sum + (point.x - meanX) ** 2, 0) || 1;
     const slope = dataPoints.reduce((sum, point) => sum + (point.x - meanX) * (point.y - meanY), 0) / denominator; const intercept = meanY - slope * meanX;
     const screenY = dataY => sim.height - dataY / 10 * sim.height;
     sim.ctx.strokeStyle = '#2563eb'; sim.ctx.lineWidth = 3; sim.ctx.beginPath(); sim.ctx.moveTo(0, screenY(intercept)); sim.ctx.lineTo(sim.width, screenY(slope * 10 + intercept)); sim.ctx.stroke();
-    let mse = 0; points.forEach((point, index) => { const dataPoint = dataPoints[index]; mse += (dataPoint.y - (slope * dataPoint.x + intercept)) ** 2; sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); });
-    get('linear-equation').textContent = `y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`; get('linear-mse').textContent = (mse / count).toFixed(2); get('linear-status').textContent = `${count}개 데이터`;
+    let mse = 0; points.forEach((point, index) => { const dataPoint = dataPoints[index]; const predicted = slope * dataPoint.x + intercept; const predictedY = screenY(predicted); mse += (dataPoint.y - predicted) ** 2; sim.ctx.strokeStyle = '#aeb8c4'; sim.ctx.lineWidth = 1; sim.ctx.setLineDash([4, 4]); sim.ctx.beginPath(); sim.ctx.moveTo(point.x, point.y); sim.ctx.lineTo(point.x, predictedY); sim.ctx.stroke(); sim.ctx.setLineDash([]); sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); });
+    const predictionX = +get('linear-predict').value; const predictionY = slope * predictionX + intercept; get('linear-prediction').textContent = Number.isFinite(predictionX) ? `예측 Y = ${predictionY.toFixed(2)}` : 'X값을 입력하세요'; get('linear-equation').textContent = `y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`; get('linear-mse').textContent = (mse / count).toFixed(2); get('linear-status').textContent = `${count}개 데이터`; get('linear-learning').innerHTML = `<strong>계산 과정</strong><span>기울기 ${slope.toFixed(2)} · 절편 ${intercept.toFixed(2)} · 평균제곱오차 ${ (mse / count).toFixed(2) }</span><span>점선은 각 데이터와 회귀선 사이의 잔차입니다.</span>`;
   };
   const generate = () => { points.length = 0; const entered = parseInput('linear', sim.width, sim.height, false); if (entered) { points.push(...entered); draw(); return; } const count = +get('linear-count').value; const noise = +get('linear-noise').value; for (let index = 0; index < count; index++) points.push({ x: 35 + index / (count - 1) * (sim.width - 70), y: sim.height - 45 - index / (count - 1) * 260 + (Math.random() - .5) * noise }); draw(); };
-  configureSlider('linear-count', 6, 40, 18, 1, 'linear-count-value', value => value, generate); configureSlider('linear-noise', 0, 60, 18, 1, 'linear-noise-value', value => value, generate); draggable(sim.canvas, points, draw); generate();
+  get('linear-predict').addEventListener('input', draw); configureSlider('linear-count', 6, 40, 18, 1, 'linear-count-value', value => value, generate); configureSlider('linear-noise', 0, 60, 18, 1, 'linear-noise-value', value => value, generate); draggable(sim.canvas, points, draw); generate();
 }
 
 function initLogistic() {
