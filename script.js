@@ -89,7 +89,7 @@ function parseInput(type, width, height, needsLabel) {
   if (!filled.length) return null;
   const valid = filled.filter(values => Number.isFinite(values[0]) && Number.isFinite(values[1]) && (!needsLabel || Number.isFinite(values[2])));
   if (valid.length !== filled.length || valid.length < 2) { showToast('X, Y와 필요한 그룹 값을 모두 입력하세요.'); return null; }
-  return valid.map(values => ({ x: clamp(values[0], 0, coordinateMax) / coordinateMax * width, y: clamp(values[1], 0, coordinateMax) / coordinateMax * height, ...(needsLabel ? { label: values[2] > 0 ? 1 : 0, group: Math.max(0, Math.round(values[2])) } : {}) }));
+  return valid.map(values => ({ x: clamp(values[0], 0, coordinateMax) / coordinateMax * width, y: type === 'linear' ? height - clamp(values[1], 0, coordinateMax) / coordinateMax * height : clamp(values[1], 0, coordinateMax) / coordinateMax * height, ...(needsLabel ? { label: values[2] > 0 ? 1 : 0, group: Math.max(0, Math.round(values[2])) } : {}) }));
 }
 function addDataRow(type, needsLabel) { const coordinateMax = type === 'linear' ? 10 : 100; const row = document.createElement('tr'); row.className = 'data-row'; row.innerHTML = `<td><input data-field="x" type="number" min="0" max="${coordinateMax}" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="${coordinateMax}" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}`; get(`${type}-data-rows`).appendChild(row); }
 function applyInput(type) { const data = parseInput(type, 100, 100, ['logistic', 'knn', 'tree', 'svm'].includes(type)); if (!data) { showToast('입력할 데이터를 먼저 작성하세요.'); return; } startSimulation(type); }
@@ -102,7 +102,17 @@ function startSimulation(type) { stopSimulation(); activeSimulation = type; ({ l
 
 function initLinear() {
   const sim = setupCanvas('linear-canvas'); const points = [];
-  const draw = () => { sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height); const count = points.length; const meanX = points.reduce((sum, p) => sum + p.x, 0) / count; const meanY = points.reduce((sum, p) => sum + p.y, 0) / count; const denominator = points.reduce((sum, p) => sum + (p.x - meanX) ** 2, 0) || 1; const slope = points.reduce((sum, p) => sum + (p.x - meanX) * (p.y - meanY), 0) / denominator; const intercept = meanY - slope * meanX; sim.ctx.strokeStyle = '#2563eb'; sim.ctx.lineWidth = 3; sim.ctx.beginPath(); sim.ctx.moveTo(0, intercept); sim.ctx.lineTo(sim.width, slope * sim.width + intercept); sim.ctx.stroke(); let mse = 0; points.forEach(point => { mse += (point.y - (slope * point.x + intercept)) ** 2; sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); }); get('linear-equation').textContent = `y = ${slope.toFixed(2)}x + ${intercept.toFixed(0)}`; get('linear-mse').textContent = (mse / count).toFixed(1); get('linear-status').textContent = `${count}개 데이터`; };
+  const draw = () => {
+    sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height);
+    const dataPoints = points.map(point => ({ x: point.x / sim.width * 10, y: (sim.height - point.y) / sim.height * 10 }));
+    const count = dataPoints.length; const meanX = dataPoints.reduce((sum, point) => sum + point.x, 0) / count; const meanY = dataPoints.reduce((sum, point) => sum + point.y, 0) / count;
+    const denominator = dataPoints.reduce((sum, point) => sum + (point.x - meanX) ** 2, 0) || 1;
+    const slope = dataPoints.reduce((sum, point) => sum + (point.x - meanX) * (point.y - meanY), 0) / denominator; const intercept = meanY - slope * meanX;
+    const screenY = dataY => sim.height - dataY / 10 * sim.height;
+    sim.ctx.strokeStyle = '#2563eb'; sim.ctx.lineWidth = 3; sim.ctx.beginPath(); sim.ctx.moveTo(0, screenY(intercept)); sim.ctx.lineTo(sim.width, screenY(slope * 10 + intercept)); sim.ctx.stroke();
+    let mse = 0; points.forEach((point, index) => { const dataPoint = dataPoints[index]; mse += (dataPoint.y - (slope * dataPoint.x + intercept)) ** 2; sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); });
+    get('linear-equation').textContent = `y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`; get('linear-mse').textContent = (mse / count).toFixed(2); get('linear-status').textContent = `${count}개 데이터`;
+  };
   const generate = () => { points.length = 0; const entered = parseInput('linear', sim.width, sim.height, false); if (entered) { points.push(...entered); draw(); return; } const count = +get('linear-count').value; const noise = +get('linear-noise').value; for (let index = 0; index < count; index++) points.push({ x: 35 + index / (count - 1) * (sim.width - 70), y: sim.height - 45 - index / (count - 1) * 260 + (Math.random() - .5) * noise }); draw(); };
   configureSlider('linear-count', 6, 40, 18, 1, 'linear-count-value', value => value, generate); configureSlider('linear-noise', 0, 60, 18, 1, 'linear-noise-value', value => value, generate); draggable(sim.canvas, points, draw); generate();
 }
