@@ -101,6 +101,7 @@ h1 { margin-top: 16px; font-size: clamp(2.15rem, 4.5vw, 3.8rem); line-height: 1.
 .learning-panel strong { color: var(--ink); }
 .learning-panel canvas { display: block; width: 100%; height: 150px; margin-top: 4px; background: #fff; border-radius: 10px; }
 .learning-panel ol { display: grid; gap: 3px; margin: 0; padding-left: 20px; }
+.learning-panel ul { display: grid; gap: 3px; margin: 0; padding-left: 20px; }
 #knn-votes { overflow: visible; line-height: 1.5; text-overflow: clip; white-space: normal; word-break: keep-all; }
 .action-button { padding: 11px 14px; border: 1px solid var(--line); background: #fff; color: var(--ink); }
 .action-button:hover { background: var(--ink); color: #fff; }
