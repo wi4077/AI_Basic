@@ -149,6 +149,7 @@ function initTree() {
   const sim = setupCanvas('tree-canvas');
   const points = [];
   const colors = ['#3182f6', '#ff6b6b'];
+  get('tree-learning').innerHTML = '<strong>분할 규칙</strong><ul id="tree-rule-list"></ul>';
   const gini = items => {
     if (!items.length) return 0;
     const positive = items.filter(item => item.label === 1).length / items.length;
@@ -173,6 +174,7 @@ function initTree() {
     sim.ctx.clearRect(0, 0, sim.width, sim.height);
     drawGrid(sim.ctx, sim.width, sim.height);
     const rootX = bestSplit(points, 'x');
+    const rules = [`첫 질문: X ≤ ${(rootX / sim.width * 100).toFixed(1)}`];
     sim.ctx.strokeStyle = '#7357c8'; sim.ctx.lineWidth = 3;
     sim.ctx.beginPath(); sim.ctx.moveTo(rootX, 0); sim.ctx.lineTo(rootX, sim.height); sim.ctx.stroke();
     let splitCount = 1;
@@ -181,6 +183,7 @@ function initTree() {
       const right = points.filter(point => point.x > rootX);
       const leftY = bestSplit(left, 'y');
       const rightY = bestSplit(right, 'y');
+      rules.push(`왼쪽 영역: Y ≤ ${(leftY / sim.height * 100).toFixed(1)}`); rules.push(`오른쪽 영역: Y ≤ ${(rightY / sim.height * 100).toFixed(1)}`);
       sim.ctx.strokeStyle = '#9b7be8'; sim.ctx.lineWidth = 2; sim.ctx.setLineDash([7, 5]);
       sim.ctx.beginPath(); sim.ctx.moveTo(0, leftY); sim.ctx.lineTo(rootX, leftY); sim.ctx.stroke();
       sim.ctx.beginPath(); sim.ctx.moveTo(rootX, rightY); sim.ctx.lineTo(sim.width, rightY); sim.ctx.stroke();
@@ -190,6 +193,7 @@ function initTree() {
     get('tree-depth-result').textContent = `${depth}단계`;
     get('tree-splits').textContent = `${splitCount}개`;
     get('tree-gini').textContent = gini(points).toFixed(2);
+    get('tree-rule-list').innerHTML = rules.map(rule => `<li>${rule}</li>`).join('');
   };
   const generate = () => { points.length = 0; const entered = parseInput('tree', sim.width, sim.height, true); if (entered) { points.push(...entered); draw(); return; } for (let index = 0; index < 36; index++) { const x = 30 + Math.random() * (sim.width - 60); const y = 30 + Math.random() * (sim.height - 60); points.push({ x, y, label: (x > sim.width * .52 && y < sim.height * .62) || (x < sim.width * .34 && y > sim.height * .56) ? 1 : 0 }); } draw(); };
   window.resetTree = generate;
