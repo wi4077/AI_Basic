@@ -45,8 +45,12 @@ h1 { margin-top: 16px; font-size: clamp(2.15rem, 4.5vw, 3.8rem); line-height: 1.
 .comparison-card dl div { display: grid; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line); }
 .comparison-card dt { color: var(--ink); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .comparison-card dd { margin: 0; color: var(--muted); line-height: 1.7; font-size: .88rem; }
+.compact-button { margin-top: 22px; }
 .quiz-panel { display: grid; gap: 18px; margin-top: 32px; }
 .quiz-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.quiz-page-header { display: flex; flex-direction: column; gap: 16px; }
+.quiz-page-header h2 { margin-top: 10px; font-size: clamp(2rem, 4vw, 3rem); }
+.quiz-page-container { margin-top: 12px; }
 .quiz-card { display: grid; gap: 12px; padding: 18px 18px 16px; border: 1px solid var(--line); border-radius: 24px; background: #fbfcfd; }
 .quiz-story-card { background: linear-gradient(135deg, rgba(49,130,246,.08), rgba(255,255,255,.92)); border-color: rgba(49,130,246,.15); }
 .quiz-card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }

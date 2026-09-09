@@ -38,7 +38,7 @@ const quizQuestions = [
   { question: 'SVM이 중요하게 보는 것은 무엇인가?', options: ['각 클래스 사이의 마진을 최대화하는 경계', '데이터가 몇 개 있는지의 총합', '결정 경계의 색상', '중심 좌표의 평균값'], answer: 0, explanation: 'SVM은 분류 경계와 가장 가까운 샘플 사이의 간격인 마진을 최대화합니다.' }
 ];
 
-const pages = { home: document.querySelector('#home-page'), concept: document.querySelector('#concept-page'), simulator: document.querySelector('#simulator-page') };
+const pages = { home: document.querySelector('#home-page'), quiz: document.querySelector('#quiz-page'), concept: document.querySelector('#concept-page'), simulator: document.querySelector('#simulator-page') };
 let currentAlgorithm = 'linear';
 let activeSimulation = null;
 const get = id => document.getElementById(id);
@@ -77,21 +77,7 @@ function renderCards() {
     </div>
   `;
 
-  get('quiz-container').innerHTML = quizQuestions.map((question, index) => `
-    <article class="quiz-card quiz-story-card" data-index="${index}">
-      <div class="quiz-card-head">
-        <span class="quiz-badge">문제 ${index + 1}</span>
-        <span class="quiz-level">개념 확인</span>
-      </div>
-      <h3>${question.question}</h3>
-      <div class="quiz-options">
-        ${question.options.map((option, optionIndex) => `
-          <button class="option-button" type="button" data-index="${index}" data-option="${optionIndex}">${option}</button>
-        `).join('')}
-      </div>
-      <p class="quiz-feedback"></p>
-    </article>
-  `).join('');
+  renderQuizPage();
 
   const glossarySearch = get('glossary-search');
   const renderGlossary = (keyword = '') => {
@@ -164,9 +150,31 @@ document.addEventListener('click', event => {
   feedback.classList.toggle('wrong', !isCorrectAnswer);
 });
 
+function renderQuizPage() {
+  const container = get('quiz-page-content');
+  if (!container) return;
+
+  container.innerHTML = quizQuestions.map((question, index) => `
+    <article class="quiz-card quiz-story-card" data-index="${index}">
+      <div class="quiz-card-head">
+        <span class="quiz-badge">문제 ${index + 1}</span>
+        <span class="quiz-level">개념 확인</span>
+      </div>
+      <h3>${question.question}</h3>
+      <div class="quiz-options">
+        ${question.options.map((option, optionIndex) => `
+          <button class="option-button" type="button" data-index="${index}" data-option="${optionIndex}">${option}</button>
+        `).join('')}
+      </div>
+      <p class="quiz-feedback"></p>
+    </article>
+  `).join('');
+}
+
 function hidePages() { Object.values(pages).forEach(page => page.classList.add('hidden')); }
 function stopSimulation() { activeSimulation = null; }
 function goHome() { hidePages(); pages.home.classList.remove('hidden'); stopSimulation(); }
+function openQuizPage() { hidePages(); pages.quiz.classList.remove('hidden'); }
 function showConcept(type) {
   currentAlgorithm = type;
   const item = algorithms[type];
