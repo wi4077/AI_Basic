@@ -54,6 +54,19 @@ h1 { margin-top: 16px; font-size: clamp(2.15rem, 4.5vw, 3.8rem); line-height: 1.
 .quiz-feedback { min-height: 38px; margin: 0; font-size: .86rem; line-height: 1.6; color: var(--muted); }
 .quiz-feedback.correct { color: #19714c; font-weight: 700; }
 .quiz-feedback.wrong { color: #a12d3c; font-weight: 700; }
+.glossary-panel { display: grid; gap: 18px; margin-top: 32px; }
+.glossary-search-wrap { display: flex; }
+.glossary-search-wrap input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); }
+.glossary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.glossary-item { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius-medium); background: #fff; }
+.glossary-item header { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.glossary-term { font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+.glossary-tag { padding: 5px 8px; border-radius: 999px; background: var(--soft-blue); color: var(--blue-dark); font-size: .7rem; font-weight: 700; }
+.glossary-item p { color: var(--muted); line-height: 1.7; }
+.glossary-item button { width: max-content; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: #f6f8fb; color: var(--ink); font-weight: 700; cursor: pointer; }
+.glossary-answer { display: none; padding-top: 8px; border-top: 1px solid var(--line); }
+.glossary-item.expanded .glossary-answer { display: block; }
+.glossary-empty { padding: 18px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); text-align: center; }
 .algorithm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .algorithm-card { position: relative; min-height: 300px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 26px 22px 24px; border: 1px solid var(--line); border-radius: var(--radius-medium); background: var(--panel); cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .algorithm-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; background: var(--blue); }

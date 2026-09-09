@@ -16,6 +16,19 @@ const comparisonRows = [
   { name: 'SVM', task: '분류', data: '고차원 특징 벡터', feature: '최대 마진 경계', strength: '일반화 성능이 좋음', weakness: '대규모 데이터에 비용이 큼', use: '이미지 분류, 텍스트 분류' }
 ];
 
+const glossaryTerms = [
+  { term: '오차', category: '기초', definition: '모델이 예측한 값과 실제 값 사이의 차이입니다.', details: '오차는 한 개인 데이터에 대한 차이이며, 전체 성능을 보려면 평균 오차나 제곱오차를 함께 보는 경우가 많습니다.', example: '예측한 집값이 3천만 원인데 실제값이 3천 5백만 원이면 오차는 5백만 원입니다.' },
+  { term: '잔차', category: '회귀', definition: '회귀 모델에서 실제값에서 예측값을 뺀 차이입니다.', details: '선형 회귀는 잔차의 제곱합을 최소화하는 직선을 찾는 방식으로 학습합니다. 잔차가 작을수록 모델이 실제 패턴을 잘 따라간다고 이해할 수 있습니다.', example: '실제값 8, 예측값 7.2이면 잔차는 0.8입니다.' },
+  { term: '시그모이드', category: '분류', definition: '입력을 0과 1 사이의 확률로 바꾸는 함수입니다.', details: '로지스틱 회귀에서 널리 쓰며, 입력값이 매우 커지거나 작아져도 확률 형태로 안정적으로 표현할 수 있습니다.', example: 'z = 2일 때 sigmoid(z) ≈ 0.88로, 높은 확률을 의미합니다.' },
+  { term: 'K', category: '분류', definition: 'KNN에서 이웃의 수를 뜻하는 값입니다.', details: 'K가 작으면 경계가 복잡해지고, K가 크면 더 부드러운 경계가 됩니다. 따라서 K는 모델의 민감도를 조절하는 중요한 하이퍼파라미터입니다.', example: 'K = 3이면 가장 가까운 3개 이웃의 다수결로 분류합니다.' },
+  { term: '마진', category: 'SVM', definition: '두 클래스 경계와 가장 가까운 점 사이의 거리입니다.', details: '마진이 넓을수록 새로운 데이터에 대해 더 안정적인 분류를 기대할 수 있습니다. SVM은 이 마진을 최대화하는 방향으로 경계를 찾습니다.', example: '경계에서 클래스 A와 B의 점이 각각 1칸, 1칸 떨어져 있으면 마진은 2입니다.' },
+  { term: '군집', category: '비지도 학습', definition: '비슷한 특성을 가진 데이터들이 묶인 집단입니다.', details: 'K-평균은 이런 군집을 찾아 데이터 구조를 이해하는 데 사용합니다. 정답 라벨이 없을 때 특히 유용합니다.', example: '고객 데이터를 보고 쇼핑 성향이 비슷한 고객들을 한 그룹으로 묶는 것과 같습니다.' },
+  { term: '결정 경계', category: '분류', definition: '두 클래스를 나누는 경계선입니다.', details: '로지스틱 회귀, SVM, 의사결정트리 모두 결정 경계를 통해 결과를 나눕니다. 경계가 어떻게 생기느냐에 따라 분류 결과가 달라집니다.', example: '고양이와 강아지를 분류할 때, 특정 특징 값이 경계보다 큰지 작은지를 기준으로 나눕니다.' },
+  { term: '지니 불순도', category: '트리', definition: '분할이 얼마나 순수하게 되었는지를 측정하는 값입니다.', details: '값이 낮을수록 한 영역 안에 같은 클래스가 더 많이 모여 있다는 뜻입니다. 의사결정트리는 이를 줄이는 방향으로 분할을 선택합니다.', example: '한 노드 안에 9개가 A, 1개가 B이면 불순도가 낮습니다.' },
+  { term: '과대적합', category: '기초', definition: '훈련 데이터는 잘 맞지만 새로운 데이터에는 잘 맞지 않는 상태입니다.', details: '깊은 트리나 과도한 파라미터는 훈련 데이터에 과하게 맞춰 버릴 수 있어요. 일반화 성능을 떨어뜨리는 대표적인 문제입니다.', example: '시험 문제를 외워서 비슷한 문제는 잘 맞히지만 다른 유형은 틀리는 경우가 과대적합입니다.' },
+  { term: '과소적합', category: '기초', definition: '모델이 데이터의 패턴을 충분히 표현하지 못해 학습이 부족한 상태입니다.', details: '모델이 너무 단순하거나 특징을 충분히 반영하지 못하면 발생합니다. 보통 직선 모델이 복잡한 패턴을 못 잡을 때 볼 수 있습니다.', example: '비선형 데이터를 직선 하나로만 설명하려는 상황입니다.' }
+];
+
 const quizQuestions = [
   { question: '선형 회귀가 가장 잘 맞추려고 하는 것은 무엇인가?', options: ['오차 제곱합을 최소화하는 직선', '데이터를 가장 많은 그룹으로 나누는 경계', '중심을 무작위로 이동시키는 과정', '레이블 없이 분류하는 방식'], answer: 0, explanation: '선형 회귀는 잔차의 제곱합을 줄이는 직선을 찾는 것이 핵심입니다.' },
   { question: '로지스틱 회귀에서 출력값을 왜 확률처럼 해석하나?', options: ['시그모이드가 0~1 사이의 값을 만들기 때문', '무조건 100% 확실한 값이 나오기 때문', '거리 계산을 기반으로 하기 때문', '데이터를 무작위로 섞기 때문'], answer: 0, explanation: '시그모이드 함수가 0과 1 사이의 확률값을 출력해 분류 기준으로 사용합니다.' },
@@ -83,9 +96,51 @@ function renderCards() {
       <p class="quiz-feedback"></p>
     </article>
   `).join('');
+
+  const glossarySearch = get('glossary-search');
+  const renderGlossary = (keyword = '') => {
+    const filtered = glossaryTerms.filter(term => {
+      const haystack = `${term.term} ${term.category} ${term.definition} ${term.details}`.toLowerCase();
+      return haystack.includes(keyword.toLowerCase());
+    });
+
+    const list = get('glossary-list');
+    if (!filtered.length) {
+      list.innerHTML = '<div class="glossary-empty">검색 결과가 없어요. 다른 키워드를 입력해보세요.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(term => `
+      <article class="glossary-item">
+        <header>
+          <span class="glossary-term">${term.term}</span>
+          <span class="glossary-tag">${term.category}</span>
+        </header>
+        <p>${term.definition}</p>
+        <button class="glossary-toggle" type="button">설명 보기</button>
+        <div class="glossary-answer">
+          <p>${term.details}</p>
+          <p><strong>예시:</strong> ${term.example}</p>
+        </div>
+      </article>
+    `).join('');
+  };
+
+  if (glossarySearch) {
+    glossarySearch.addEventListener('input', event => renderGlossary(event.target.value));
+    renderGlossary();
+  }
 }
 
 document.addEventListener('click', event => {
+  const glossaryToggle = event.target.closest('.glossary-toggle');
+  if (glossaryToggle) {
+    const item = glossaryToggle.closest('.glossary-item');
+    item.classList.toggle('expanded');
+    glossaryToggle.textContent = item.classList.contains('expanded') ? '설명 닫기' : '설명 보기';
+    return;
+  }
+
   const target = event.target.closest('.option-button');
   if (!target) return;
 
