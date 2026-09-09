@@ -1,11 +1,20 @@
 const algorithms = {
-  linear: { title: '선형 회귀', kicker: 'REGRESSION', summary: '연속적인 값을 가장 잘 설명하는 직선을 찾아 예측합니다.', core: '입력값과 목표값의 관계를 y = wx + b 형태의 직선으로 근사합니다. 오차 제곱의 합이 가장 작아지는 기울기와 절편을 찾습니다.', controls: '데이터 개수, 잡음 정도, 데이터 점의 위치를 조절할 수 있습니다.', observe: '점 하나의 위치가 회귀선과 평균제곱오차에 어떤 영향을 주는지 확인하세요.', formula: '공식은 MSE = 1/n Σ(yᵢ - ŷᵢ)²입니다. 가격, 온도, 수요처럼 연속적인 값을 예측할 때 활용합니다.' },
-  logistic: { title: '로지스틱 회귀', kicker: 'CLASSIFICATION', summary: '확률을 계산해 두 클래스 중 어디에 속하는지 분류합니다.', core: '선형 결합값을 시그모이드 함수에 넣어 0과 1 사이의 확률로 변환하고 기준 확률에 따라 클래스를 결정합니다.', controls: '기울기, 절편, 분류 기준값을 조절하고 데이터 점을 이동할 수 있습니다.', observe: '결정 경계와 기준값이 바뀌면 분류 결과가 어떻게 달라지는지 확인하세요.', formula: '확률은 σ(z) = 1/(1+e⁻ᶻ)로 계산합니다. 스팸 판별, 합격 여부, 질병 위험처럼 두 결과를 분류하는 데 사용합니다.' },
-  knn: { title: 'K-최근접 이웃', kicker: 'CLASSIFICATION', summary: '새로운 점 주변의 가까운 이웃을 보고 다수결로 분류합니다.', core: '새 점과 학습 데이터 사이의 거리를 계산한 뒤 가장 가까운 K개의 클래스 중 다수인 클래스를 선택합니다.', controls: 'K, 그룹 수, 그룹별 샘플 수를 조절하고 보라색 대상 점을 드래그할 수 있습니다.', observe: 'K가 작을 때와 클 때 결정 영역과 분류 결과가 어떻게 달라지는지 비교하세요.', formula: '거리는 d = √Σ(xᵢ-yᵢ)²로 계산합니다. 별도의 학습식 없이 데이터의 지역적 패턴을 이용하는 방식입니다.' },
-  kmeans: { title: 'K-평균', kicker: 'CLUSTERING', summary: '정답 라벨 없이 비슷한 데이터끼리 K개의 그룹으로 묶습니다.', core: '각 점을 가장 가까운 중심에 할당하고 각 그룹의 평균 위치로 중심을 이동하는 과정을 반복합니다.', controls: '클러스터 수와 데이터 개수를 조절하고 한 단계씩 학습을 진행할 수 있습니다.', observe: '중심이 이동하고 그룹 색상이 안정되는 과정을 확인하세요.', formula: '목표는 각 점과 소속 중심 사이 거리의 제곱합을 줄이는 것입니다. 고객 유형, 이미지 색상, 문서 주제 분류에 활용합니다.' },
-  tree: { title: '의사결정트리', kicker: 'CLASSIFICATION / REGRESSION', summary: '질문을 차례로 던져 데이터를 이해하기 쉬운 영역으로 나눕니다.', core: '특성의 기준값을 질문으로 사용해 데이터를 분할하고, 각 영역의 클래스가 최대한 순수해지도록 다음 질문을 선택합니다.', controls: '트리 깊이와 샘플 구성을 조절하고 지니 불순도 기반 분할선을 확인할 수 있습니다.', observe: '깊이가 커질수록 경계가 복잡해지고 과대적합 위험이 커지는 과정을 비교하세요.', formula: '지니 불순도는 Gini = 1 - Σpᵢ²입니다. 설명 가능한 규칙이 필요하거나 분류와 회귀를 함께 다룰 때 활용합니다.' },
-  svm: { title: '서포트 벡터 머신', kicker: 'CLASSIFICATION', summary: '두 클래스 사이의 간격이 가장 넓어지는 경계면을 찾습니다.', core: '결정 경계와 가장 가까운 점인 서포트 벡터를 기준으로 마진을 최대화해 분류합니다.', controls: '마진 폭과 경계선 기울기를 조절하고 데이터 점을 직접 이동할 수 있습니다.', observe: '마진 안에 들어오는 점과 경계를 침범하는 점의 수가 어떻게 변하는지 확인하세요.', formula: '경계는 wᵀx+b=0이고 마진 폭은 2/||w||입니다. 특성이 많은 데이터나 명확한 경계가 있는 분류에 활용합니다.' }
+  linear: { title: '선형 회귀', kicker: 'REGRESSION', summary: '연속적인 값을 가장 잘 설명하는 직선을 찾아 예측합니다.', core: '입력값과 목표값의 관계를 y = wx + b 형태의 직선으로 근사합니다. 오차 제곱의 합이 가장 작아지는 기울기와 절편을 찾습니다.', controls: '데이터 개수, 잡음 정도, 데이터 점의 위치를 조절할 수 있습니다.', observe: '점 하나의 위치가 회귀선과 평균제곱오차에 어떤 영향을 주는지 확인하세요.', formula: '공식은 MSE = 1/n Σ(yᵢ - ŷᵢ)²입니다. 가격, 온도, 수요처럼 연속적인 값을 예측할 때 활용합니다.', theory: '선형 회귀는 “종속 변수와 설명 변수 사이의 관계를 직선으로 가정한다”는 핵심 전제를 사용합니다. 실제 데이터는 잡음이 섞여 있지만, 잔차의 제곱합을 최소화하는 방식으로 직선을 가장 잘 맞추는 기울기와 절편을 찾습니다. 이 방법은 단순하지만 해석이 쉽고, 추정된 계수의 의미를 직관적으로 이해할 수 있다는 장점이 있습니다. 다만, 관계가 비선형적이면 직선만으로는 충분하지 않을 수 있습니다.' },
+  logistic: { title: '로지스틱 회귀', kicker: 'CLASSIFICATION', summary: '확률을 계산해 두 클래스 중 어디에 속하는지 분류합니다.', core: '선형 결합값을 시그모이드 함수에 넣어 0과 1 사이의 확률로 변환하고 기준 확률에 따라 클래스를 결정합니다.', controls: '기울기, 절편, 분류 기준값을 조절하고 데이터 점을 이동할 수 있습니다.', observe: '결정 경계와 기준값이 바뀌면 분류 결과가 어떻게 달라지는지 확인하세요.', formula: '확률은 σ(z) = 1/(1+e⁻ᶻ)로 계산합니다. 스팸 판별, 합격 여부, 질병 위험처럼 두 결과를 분류하는 데 사용합니다.', theory: '로지스틱 회귀는 출력값을 확률로 바꾸기 위해 시그모이드 함수를 사용합니다. 선형 결합 z = wx + b를 입력으로 받아 0~1 범위의 확률을 만들고, 기준값인 0.5나 사용자가 설정한 임계값을 넘느냐에 따라 클래스가 결정됩니다. 학습은 손실 함수인 교차엔트로피를 줄이는 방향으로 이루어지며, 클래스 간 경계가 명확하고 해석 가능한 모델로 널리 쓰입니다. 다만, 복잡한 비선형 경계는 다른 모델이 더 적합할 수 있습니다.' },
+  knn: { title: 'K-최근접 이웃', kicker: 'CLASSIFICATION', summary: '새로운 점 주변의 가까운 이웃을 보고 다수결로 분류합니다.', core: '새 점과 학습 데이터 사이의 거리를 계산한 뒤 가장 가까운 K개의 클래스 중 다수인 클래스를 선택합니다.', controls: 'K, 그룹 수, 그룹별 샘플 수를 조절하고 보라색 대상 점을 드래그할 수 있습니다.', observe: 'K가 작을 때와 클 때 결정 영역과 분류 결과가 어떻게 달라지는지 비교하세요.', formula: '거리는 d = √Σ(xᵢ-yᵢ)²로 계산합니다. 별도의 학습식 없이 데이터의 지역적 패턴을 이용하는 방식입니다.', theory: 'KNN은 “비슷한 데이터는 비슷한 클래스를 가질 가능성이 높다”는 직관을 바탕으로 동작합니다. 새로운 점에서 가장 가까운 K개의 학습 샘플을 찾고, 그들 중 다수가 속한 클래스로 예측합니다. 따라서 K의 크기는 모델의 민감도를 결정하며, K가 작으면 경계가 복잡해지고 K가 크면 부드러운 경계가 됩니다. 학습 단계가 거의 없다는 점이 장점이지만, 차원이 커지면 거리 계산이 비효율적이어서 대규모 데이터에는 부담이 됩니다.' },
+  kmeans: { title: 'K-평균', kicker: 'CLUSTERING', summary: '정답 라벨 없이 비슷한 데이터끼리 K개의 그룹으로 묶습니다.', core: '각 점을 가장 가까운 중심에 할당하고 각 그룹의 평균 위치로 중심을 이동하는 과정을 반복합니다.', controls: '클러스터 수와 데이터 개수를 조절하고 한 단계씩 학습을 진행할 수 있습니다.', observe: '중심이 이동하고 그룹 색상이 안정되는 과정을 확인하세요.', formula: '목표는 각 점과 소속 중심 사이 거리의 제곱합을 줄이는 것입니다. 고객 유형, 이미지 색상, 문서 주제 분류에 활용합니다.', theory: 'K-평균은 비지도 학습의 대표 예시로, 라벨이 없는 데이터에서 유사한 샘플들을 묶는 데 사용됩니다. 각 반복에서 점을 가장 가까운 중심에 할당하고, 각 군집의 평균 위치로 중심을 다시 잡아 내부 거리 제곱합을 줄이는 방식입니다. 이 과정은 중심이 안정될 때까지 반복되며, 군집 수 K를 정하는 것이 중요한 설계 요소입니다. 초기 중심 위치가 다르면 최종 결과도 달라질 수 있어서, 보통 여러 번 초기화를 시도합니다.' },
+  tree: { title: '의사결정트리', kicker: 'CLASSIFICATION / REGRESSION', summary: '질문을 차례로 던져 데이터를 이해하기 쉬운 영역으로 나눕니다.', core: '특성의 기준값을 질문으로 사용해 데이터를 분할하고, 각 영역의 클래스가 최대한 순수해지도록 다음 질문을 선택합니다.', controls: '트리 깊이와 샘플 구성을 조절하고 지니 불순도 기반 분할선을 확인할 수 있습니다.', observe: '깊이가 커질수록 경계가 복잡해지고 과대적합 위험이 커지는 과정을 비교하세요.', formula: '지니 불순도는 Gini = 1 - Σpᵢ²입니다. 설명 가능한 규칙이 필요하거나 분류와 회귀를 함께 다룰 때 활용합니다.', theory: '의사결정트리는 데이터를 여러 질문으로 나누어 규칙 기반의 분류를 만드는 알고리즘입니다. 각 분할은 불순도를 줄이는 방향으로 선택되며, 깊이가 깊어질수록 더 정교한 규칙을 만들 수 있지만 훈련 데이터에 대한 적합도는 상승하고 일반화 성능은 떨어질 수 있습니다. 이런 이유로 트리를 제한하는 가지치기(pruning)가 자주 사용됩니다. 트리는 모델의 의사결정 과정을 사람이 읽기 쉬워 설명 가능성이 높다는 점이 큰 장점입니다.' },
+  svm: { title: '서포트 벡터 머신', kicker: 'CLASSIFICATION', summary: '두 클래스 사이의 간격이 가장 넓어지는 경계면을 찾습니다.', core: '결정 경계와 가장 가까운 점인 서포트 벡터를 기준으로 마진을 최대화해 분류합니다.', controls: '마진 폭과 경계선 기울기를 조절하고 데이터 점을 직접 이동할 수 있습니다.', observe: '마진 안에 들어오는 점과 경계를 침범하는 점의 수가 어떻게 변하는지 확인하세요.', formula: '경계는 wᵀx+b=0이고 마진 폭은 2/||w||입니다. 특성이 많은 데이터나 명확한 경계가 있는 분류에 활용합니다.', theory: 'SVM은 클래스 사이의 경계면을 최대 마진으로 결정하는 방식입니다. 경계에서 가장 가까운 샘플들인 서포트 벡터가 마진을 형성하고, 이들을 기준으로 모델이 최적 경계를 찾습니다. 마진이 넓을수록 새로운 데이터에 대해 더 안정적으로 분류할 가능성이 높아지며, 일반화 성능이 좋다는 이유로 널리 사용됩니다. 커널 트릭을 이용하면 비선형 경계도 표현할 수 있어 고차원 분류 문제에서 강력한 성능을 발휘합니다.' }
 };
+
+const comparisonRows = [
+  { name: '선형 회귀', task: '예측', data: '연속형 입력, 연속형 타깃', feature: '직선 형태의 관계', strength: '해석이 쉽고 계산이 단순함', weakness: '비선형 구조를 잘 못 표현함', use: '주가, 온도, 수요 예측' },
+  { name: '로지스틱 회귀', task: '분류', data: '연속형 입력, 이진 타깃', feature: '시그모이드 확률화', strength: '확률 해석이 가능함', weakness: '복잡한 경계는 표현 제한', use: '스팸 판별, 합격 여부' },
+  { name: 'KNN', task: '분류', data: '라벨이 있는 특징 벡터', feature: '가까운 이웃의 다수결', strength: '직관적이고 학습이 간단함', weakness: '데이터가 많으면 느림', use: '추천, 이상 탐지' },
+  { name: 'K-평균', task: '군집화', data: '라벨이 없는 특징 벡터', feature: '중심 이동 기반 군집', strength: '비지도 학습에 적합함', weakness: 'K를 직접 정해야 함', use: '고객 세그먼트, 문서 분류' },
+  { name: '의사결정트리', task: '분류/회귀', data: '범주형 또는 연속형 특성', feature: '질문 기반 분할', strength: '결과를 쉽게 설명 가능', weakness: '과대적합되기 쉬움', use: '대출 심사, 고객 분류' },
+  { name: 'SVM', task: '분류', data: '고차원 특징 벡터', feature: '최대 마진 경계', strength: '일반화 성능이 좋음', weakness: '대규모 데이터에 비용이 큼', use: '이미지 분류, 텍스트 분류' }
+];
 
 const pages = { home: document.querySelector('#home-page'), concept: document.querySelector('#concept-page'), simulator: document.querySelector('#simulator-page') };
 let currentAlgorithm = 'linear';
@@ -24,6 +33,35 @@ function renderCards() {
   ];
   let cardNumber = 0;
   get('algorithm-cards').innerHTML = groups.map(group => `<section class="algorithm-group"><div class="group-heading"><div><span class="eyebrow">ALGORITHM GROUP</span><h2>${group.title}</h2></div><p>${group.description}</p></div><div class="algorithm-grid">${group.keys.map(key => { const item = algorithms[key]; cardNumber += 1; return `<article class="algorithm-card algorithm-card--${key}" onclick="showConcept('${key}')"><div><span class="card-number">0${cardNumber} / ${item.kicker}</span><h2>${item.title}</h2><p>${item.summary}</p></div><span class="card-link">개념 카드 보기 -></span></article>`; }).join('')}</div></section>`).join('');
+
+  get('algorithm-comparison').innerHTML = `
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>알고리즘</th>
+          <th>목적</th>
+          <th>데이터 구조</th>
+          <th>핵심 특징</th>
+          <th>장점</th>
+          <th>단점</th>
+          <th>활용 예시</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${comparisonRows.map(row => `
+          <tr>
+            <td class="compare-name">${row.name}</td>
+            <td>${row.task}</td>
+            <td>${row.data}</td>
+            <td>${row.feature}</td>
+            <td>${row.strength}</td>
+            <td>${row.weakness}</td>
+            <td>${row.use}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 function hidePages() { Object.values(pages).forEach(page => page.classList.add('hidden')); }
@@ -39,6 +77,7 @@ function showConcept(type) {
   get('concept-controls').textContent = item.controls;
   get('concept-observe').textContent = item.observe;
   get('concept-formula').textContent = item.formula;
+  get('concept-theory').textContent = item.theory;
   hidePages(); pages.concept.classList.remove('hidden'); stopSimulation();
 }
 function openCurrentSimulator() { openSimulator(currentAlgorithm); }
