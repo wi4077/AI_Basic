@@ -16,6 +16,15 @@ const comparisonRows = [
   { name: 'SVM', task: '분류', data: '고차원 특징 벡터', feature: '최대 마진 경계', strength: '일반화 성능이 좋음', weakness: '대규모 데이터에 비용이 큼', use: '이미지 분류, 텍스트 분류' }
 ];
 
+const quizQuestions = [
+  { question: '선형 회귀가 가장 잘 맞추려고 하는 것은 무엇인가?', options: ['오차 제곱합을 최소화하는 직선', '데이터를 가장 많은 그룹으로 나누는 경계', '중심을 무작위로 이동시키는 과정', '레이블 없이 분류하는 방식'], answer: 0, explanation: '선형 회귀는 잔차의 제곱합을 줄이는 직선을 찾는 것이 핵심입니다.' },
+  { question: '로지스틱 회귀에서 출력값을 왜 확률처럼 해석하나?', options: ['시그모이드가 0~1 사이의 값을 만들기 때문', '무조건 100% 확실한 값이 나오기 때문', '거리 계산을 기반으로 하기 때문', '데이터를 무작위로 섞기 때문'], answer: 0, explanation: '시그모이드 함수가 0과 1 사이의 확률값을 출력해 분류 기준으로 사용합니다.' },
+  { question: 'KNN에서 K 값이 작아지면 어떤 변화가 생기나?', options: ['결정 경계가 더 복잡해진다', '데이터가 항상 더 많이 묶인다', '모든 값이 같은 클래스로 분류된다', '모델이 자동으로 학습된다'], answer: 0, explanation: 'K가 작을수록 가까운 이웃만 보고 판별하므로 경계가 세밀하고 민감해집니다.' },
+  { question: 'K-평균의 핵심 동작은 무엇인가?', options: ['점들을 가장 가까운 중심에 할당하고 중심을 다시 계산한다', '모든 점을 레이블로 분류한다', '직선을 외삽해 예측한다', '결정 경계를 마진으로 넓힌다'], answer: 0, explanation: 'K-평균은 점 할당과 중심 이동을 반복해 군집을 찾는 알고리즘입니다.' },
+  { question: '의사결정트리의 장점으로 가장 적절한 것은?', options: ['결정 과정을 사람이 읽기 쉽게 이해할 수 있다', '항상 모든 데이터를 완벽히 분류한다', '학습 데이터가 없어도 동작한다', '특성 간 상관관계를 무시한다'], answer: 0, explanation: '트리는 질문 기반으로 규칙을 만들기 때문에 설명 가능성이 높습니다.' },
+  { question: 'SVM이 중요하게 보는 것은 무엇인가?', options: ['각 클래스 사이의 마진을 최대화하는 경계', '데이터가 몇 개 있는지의 총합', '결정 경계의 색상', '중심 좌표의 평균값'], answer: 0, explanation: 'SVM은 분류 경계와 가장 가까운 샘플 사이의 간격인 마진을 최대화합니다.' }
+];
+
 const pages = { home: document.querySelector('#home-page'), concept: document.querySelector('#concept-page'), simulator: document.querySelector('#simulator-page') };
 let currentAlgorithm = 'linear';
 let activeSimulation = null;
@@ -62,7 +71,44 @@ function renderCards() {
       </tbody>
     </table>
   `;
+
+  get('quiz-container').innerHTML = quizQuestions.map((question, index) => `
+    <article class="quiz-card" data-index="${index}">
+      <h3>Q${index + 1}. ${question.question}</h3>
+      <div class="quiz-options">
+        ${question.options.map((option, optionIndex) => `
+          <button class="option-button" type="button" data-index="${index}" data-option="${optionIndex}">${option}</button>
+        `).join('')}
+      </div>
+      <p class="quiz-feedback"></p>
+    </article>
+  `).join('');
 }
+
+document.addEventListener('click', event => {
+  const target = event.target.closest('.option-button');
+  if (!target) return;
+
+  const questionIndex = Number(target.dataset.index);
+  const selectedOption = Number(target.dataset.option);
+  const question = quizQuestions[questionIndex];
+  const card = target.closest('.quiz-card');
+  const feedback = card.querySelector('.quiz-feedback');
+  const buttons = card.querySelectorAll('.option-button');
+
+  buttons.forEach(button => {
+    const isCorrect = Number(button.dataset.option) === question.answer;
+    const isSelected = Number(button.dataset.option) === selectedOption;
+    button.disabled = true;
+    button.classList.toggle('correct', isCorrect);
+    button.classList.toggle('wrong', isSelected && !isCorrect);
+  });
+
+  const isCorrectAnswer = selectedOption === question.answer;
+  feedback.textContent = isCorrectAnswer ? `정답! ${question.explanation}` : `오답! ${question.explanation}`;
+  feedback.classList.toggle('correct', isCorrectAnswer);
+  feedback.classList.toggle('wrong', !isCorrectAnswer);
+});
 
 function hidePages() { Object.values(pages).forEach(page => page.classList.add('hidden')); }
 function stopSimulation() { activeSimulation = null; }
