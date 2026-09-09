@@ -57,37 +57,33 @@ function renderCards() {
   get('algorithm-cards').innerHTML = groups.map(group => `<section class="algorithm-group"><div class="group-heading"><div><span class="eyebrow">ALGORITHM GROUP</span><h2>${group.title}</h2></div><p>${group.description}</p></div><div class="algorithm-grid">${group.keys.map(key => { const item = algorithms[key]; cardNumber += 1; return `<article class="algorithm-card algorithm-card--${key}" onclick="showConcept('${key}')"><div><span class="card-number">0${cardNumber} / ${item.kicker}</span><h2>${item.title}</h2><p>${item.summary}</p></div><span class="card-link">개념 카드 보기 -></span></article>`; }).join('')}</div></section>`).join('');
 
   get('algorithm-comparison').innerHTML = `
-    <table class="comparison-table">
-      <thead>
-        <tr>
-          <th>알고리즘</th>
-          <th>목적</th>
-          <th>데이터 구조</th>
-          <th>핵심 특징</th>
-          <th>장점</th>
-          <th>단점</th>
-          <th>활용 예시</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${comparisonRows.map(row => `
-          <tr>
-            <td class="compare-name">${row.name}</td>
-            <td>${row.task}</td>
-            <td>${row.data}</td>
-            <td>${row.feature}</td>
-            <td>${row.strength}</td>
-            <td>${row.weakness}</td>
-            <td>${row.use}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="comparison-news-grid">
+      ${comparisonRows.map((row, index) => `
+        <article class="comparison-card">
+          <div class="comparison-card-top">
+            <span class="comparison-index">0${index + 1}</span>
+            <span class="comparison-pill">${row.task}</span>
+          </div>
+          <h3>${row.name}</h3>
+          <dl>
+            <div><dt>데이터</dt><dd>${row.data}</dd></div>
+            <div><dt>핵심 특성</dt><dd>${row.feature}</dd></div>
+            <div><dt>장점</dt><dd>${row.strength}</dd></div>
+            <div><dt>단점</dt><dd>${row.weakness}</dd></div>
+            <div><dt>활용</dt><dd>${row.use}</dd></div>
+          </dl>
+        </article>
+      `).join('')}
+    </div>
   `;
 
   get('quiz-container').innerHTML = quizQuestions.map((question, index) => `
-    <article class="quiz-card" data-index="${index}">
-      <h3>Q${index + 1}. ${question.question}</h3>
+    <article class="quiz-card quiz-story-card" data-index="${index}">
+      <div class="quiz-card-head">
+        <span class="quiz-badge">문제 ${index + 1}</span>
+        <span class="quiz-level">개념 확인</span>
+      </div>
+      <h3>${question.question}</h3>
       <div class="quiz-options">
         ${question.options.map((option, optionIndex) => `
           <button class="option-button" type="button" data-index="${index}" data-option="${optionIndex}">${option}</button>
@@ -111,12 +107,15 @@ function renderCards() {
     }
 
     list.innerHTML = filtered.map(term => `
-      <article class="glossary-item">
+      <article class="glossary-item glossary-story-card">
         <header>
-          <span class="glossary-term">${term.term}</span>
-          <span class="glossary-tag">${term.category}</span>
+          <div>
+            <span class="glossary-kicker">${term.category}</span>
+            <span class="glossary-term">${term.term}</span>
+          </div>
+          <span class="glossary-tag">용어</span>
         </header>
-        <p>${term.definition}</p>
+        <p class="glossary-summary">${term.definition}</p>
         <button class="glossary-toggle" type="button">설명 보기</button>
         <div class="glossary-answer">
           <p>${term.details}</p>
