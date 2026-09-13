@@ -390,10 +390,15 @@ function initKnn() {
     const largeBoundary = Math.max(3, Math.round(candidateRange * 0.7));
     const isNearBest = Math.abs(selectedK - bestK) <= 1;
     const kMessage = `K=${selectedK}`;
-    if (isNearBest && currentAccuracy >= 60) return `${kMessage}은(는) 적절한 K 값입니다. 현재 검증 정확도 ${currentAccuracy.toFixed(0)}%입니다.`;
+    const bestRangeStart = Math.max(1, bestK - 1);
+    const bestRangeEnd = Math.min(candidateRange, bestK + 1);
+    const bestRangeText = `현재 데이터에서 적절한 K는 보통 ${bestRangeStart}~${bestRangeEnd} 범위입니다.`;
+    if (isNearBest && currentAccuracy >= 60) return `${kMessage}은(는) 적정 K 값입니다. 이 데이터에서 가장 적절한 K 값이라서 적정 K 값으로 판단됩니다. 현재 검증 정확도 ${currentAccuracy.toFixed(0)}%입니다.`;
+    if (selectedK < bestK) return `${kMessage}은(는) 아직 작은 편입니다. K를 ${bestK}로 올리면 경계가 더 안정되어 적절한 K 범위에 가까워집니다.`;
+    if (selectedK > bestK) return `${kMessage}은(는) 큰 편입니다. K를 ${bestK}로 내리면 경계가 더 민감해져 적절한 K 범위에 가까워집니다.`;
     if (selectedK <= smallBoundary) return `${kMessage}은(는) 과적합 상태입니다. K가 너무 작아 노이즈에 민감합니다.`;
     if (selectedK >= largeBoundary) return `${kMessage}은(는) 과소적합 상태입니다. K가 너무 커서 경계가 지나치게 부드러워집니다.`;
-    return `${kMessage}은(는) 보통 수준입니다. 더 조정해보면 더 좋은 경계를 찾을 수 있습니다.`;
+    return `${kMessage}은(는) 보통 수준입니다. ${bestRangeText} 더 조정해보면 더 좋은 경계를 찾을 수 있습니다.`;
   };
   const draw = () => {
     const k = +get('knn-k').value;
@@ -412,11 +417,13 @@ function initKnn() {
     get('knn-result').textContent = `그룹 ${winner + 1}`;
     get('knn-votes').textContent = Object.entries(votes).map(([group, vote]) => `${+group + 1}번 ${vote}표`).join(' / ');
     get('knn-distance-list').innerHTML = neighbors.map((point, index) => `<li>${index + 1}위 · 그룹 ${point.group + 1} · 거리 ${point.distance.toFixed(1)}</li>`).join('');
+    const bestRangeStart = Math.max(1, best.k - 1);
+    const bestRangeEnd = Math.min(Math.min(15, points.length), best.k + 1);
     renderStepList('knn-learning', '단계별 변화', [
       `1단계: 후보 K 값 1~${Math.min(15, points.length)}를 검증하고 각 K의 정확도를 계산합니다.`,
       `2단계: 현재 K = ${k}의 검증 정확도는 ${currentAccuracy.toFixed(0)}%입니다.`,
       `3단계: ${kJudgment}`,
-      `4단계: K가 작으면 경계가 민감하고, K가 크면 경계가 부드러워집니다.`
+      `4단계: 이 데이터에서 적절한 K 범위는 ${bestRangeStart}~${bestRangeEnd}입니다. K를 1씩 조정해보면 경계가 어디서 안정적으로 바뀌는지 확인할 수 있습니다.`
     ]);
   };
   const generate = () => { points.length = 0; const entered = parseInput('knn', sim.width, sim.height, true); if (entered) { points.push(...entered); draw(); return; } const groups = +get('knn-groups').value; const count = +get('knn-count').value; const layout = randomChoice(['corners', 'diagonal', 'center']); const centers = Array.from({ length: groups }, (_, group) => layout === 'corners' ? { x: sim.width * (group % 2 ? .72 : .28), y: sim.height * (group < 2 ? .3 : .72) } : layout === 'diagonal' ? { x: sim.width * (.2 + group / Math.max(groups - 1, 1) * .6), y: sim.height * (.75 - group / Math.max(groups - 1, 1) * .5) } : { x: randomBetween(sim.width * .2, sim.width * .8), y: randomBetween(sim.height * .2, sim.height * .8) }); for (let group = 0; group < groups; group++) for (let index = 0; index < count; index++) points.push({ x: clamp(centers[group].x + randomNormal(0, 55), 12, sim.width - 12), y: clamp(centers[group].y + randomNormal(0, 48), 12, sim.height - 12), group }); draw(); };
