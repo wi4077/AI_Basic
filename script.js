@@ -203,66 +203,66 @@ function openSimulator(type, data = '') {
 function control(label, output, input) { return `<div class="control"><label>${label} <output id="${output}"></output></label><input id="${input}" type="range"></div>`; }
 function dataEntry(type, needsLabel) {
   const coordinateMax = type === 'linear' ? 10 : 100;
-  const labelHeader = needsLabel ? '<th>그룹</th>' : '';
-  const rows = Array.from({ length: 4 }, () => `<tr class="data-row"><td><input data-field="x" type="number" min="0" max="${coordinateMax}" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="${coordinateMax}" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}</tr>`).join('');
-  return `<div class="data-entry"><label>직접 데이터 입력 <span>X, Y 입력 범위: 0~${coordinateMax}</span></label><div class="data-table-wrap"><table><thead><tr><th>X</th><th>Y</th>${labelHeader}</tr></thead><tbody id="${type}-data-rows">${rows}</tbody></table></div><div class="data-actions"><button class="action-button" onclick="addDataRow('${type}', ${needsLabel})">행 추가</button><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div></div>`;
+  const labelHeader = needsLabel ? '<th>그룹(0 또는 1)</th>' : '';
+  const rows = Array.from({ length: 4 }, () => `<tr class="data-row"><td><input data-field="x" type="number" min="0" max="${coordinateMax}" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="${coordinateMax}" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" min="0" max="1" placeholder="0/1"></td>' : ''}</tr>`).join('');
+  return `<div class="data-entry"><label>점 직접 입력하기 <span>X, Y값 범위: 0~${coordinateMax}</span></label><div class="data-table-wrap"><table><thead><tr><th>X</th><th>Y</th>${labelHeader}</tr></thead><tbody id="${type}-data-rows">${rows}</tbody></table></div><div class="data-actions"><button class="action-button" onclick="addDataRow('${type}', ${needsLabel})">행 추가</button><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div><p class="data-help">0은 파란색 그룹, 1은 빨간색 그룹입니다.</p></div>`;
 }
 function simulatorGuide(type) {
   const guides = {
     linear: {
-      title: '선형 회귀는 무엇을 보나요?',
+      title: '선형 회귀를 쉽게 따라가 볼까요?',
       steps: [
-        '1. 데이터 점을 보고 전체적으로 올라가는지, 내려가는지 확인하세요.',
-        '2. 잡음 정도를 바꾸면 회귀선이 왜 흔들리는지 관찰하세요.',
-        '3. X값을 입력하면 직선 위의 예측값이 어떻게 계산되는지 확인하세요.'
+        '1. 점들이 보이는 방향을 보세요. 점들이 위로 올라가면 양의 관계, 내려가면 음의 관계입니다.',
+        '2. 잡음 정도를 바꾸면 직선이 점들에 더 잘 맞는지 흐려지는지 보세요.',
+        '3. X값을 입력하면 직선 위의 예상 값을 볼 수 있습니다.'
       ],
-      tip: '직선은 데이터의 평균 관계를 요약한 것으로, 각 점까지의 거리를 줄이는 방향으로 만들어집니다.'
+      tip: '직선은 데이터의 전체적인 흐름을 한 줄로 요약한 것입니다. 점들과 직선 사이의 거리가 작을수록 잘 맞는다고 생각하면 됩니다.'
     },
     logistic: {
-      title: '로지스틱 회귀는 어떻게 분류하나요?',
+      title: '로지스틱 회귀를 쉽게 따라가 볼까요?',
       steps: [
-        '1. 기울기는 경계선이 얼마나 기울어지는지 조절합니다. 값이 크면 경계가 급격하게 변합니다.',
-        '2. 절편은 경계가 화면 위아래로 이동하도록 만듭니다. 점이 얼마나 쉽게 분류되는지도 바뀝니다.',
-        '3. 기준값은 0~1 사이의 확률 중 어느 수준을 기준으로 클래스를 정할지 결정합니다. 예를 들어 0.50은 절반 이상일 때 1로 분류합니다.',
-        '4. 점선은 기준값에 따라 만들어지는 결정 경계입니다. 점이 경계 아래면 하나의 클래스, 위면 다른 클래스가 됩니다.'
+        '1. 경계가 가파르다는 것은 분류 선이 급하게 바뀐다는 뜻입니다.',
+        '2. 경계의 높이는 분류 선이 위아래로 움직이는 정도입니다.',
+        '3. 기준값은 정답을 고를 때 쓰는 기준입니다. 확률이 기준값보다 높으면 1로, 낮으면 0으로 분류합니다.',
+        '4. 점선은 두 그룹을 나누는 경계입니다. 점이 경계 위에 있으면 다른 그룹으로 보입니다.'
       ],
-      tip: '확률은 시그모이드 함수에 값을 넣어 계산합니다. 출력값이 기준값보다 크면 해당 클래스, 작으면 다른 클래스로 판단합니다.'
+      tip: '복잡한 수식 대신, “입력값을 계산해서 확률을 만들고 기준에 따라 결정한다”고 생각하면 됩니다.'
     },
     knn: {
-      title: 'KNN은 가까운 이웃을 기준으로 판단합니다.',
+      title: 'KNN을 쉽게 따라가 볼까요?',
       steps: [
-        '1. 보라색 타깃 점을 드래그해 주변 데이터의 변화를 확인하세요.',
-        '2. K 값을 크게 하면 많은 이웃을 함께 보므로 경계가 부드러워집니다.',
-        '3. 거리 순위와 투표 결과를 비교해 어떤 이웃이 분류에 영향을 주는지 확인하세요.'
+        '1. 보라색 점을 드래그해서 주변 데이터의 모습을 바꿔보세요.',
+        '2. K값을 크게 하면 주변 점을 많이 참고합니다. 작게 하면 가까운 점만 참고합니다.',
+        '3. 거리 순위와 표를 보면 어떤 점이 가장 많이 선택됐는지 알 수 있습니다.'
       ],
-      tip: 'KNN은 매번 새로운 데이터에 대해 거리를 다시 계산하므로, K 값이 클수록 주변 패턴을 넓게 반영합니다.'
+      tip: 'KNN은 “가까운 친구가 많이 속한 그룹으로 결정한다”고 생각하면 됩니다.'
     },
     kmeans: {
-      title: 'K-평균은 중심을 반복해서 움직입니다.',
+      title: 'K-평균을 쉽게 따라가 볼까요?',
       steps: [
-        '1. 한 단계 학습을 누르면 모든 점을 가장 가까운 중심에 할당합니다.',
-        '2. 각 군집의 평균 위치가 중심으로 다시 계산됩니다.',
-        '3. 중심이 더 이상 크게 움직이지 않을 때까지 반복해 비슷한 점들을 묶습니다.'
+        '1. “한 단계 학습”을 누르면 점을 가장 가까운 중심에 넣습니다.',
+        '2. 각 그룹의 가운데 위치를 다시 계산해 중심을 움직입니다.',
+        '3. 중심이 더 이상 움직이지 않으면 비슷한 점들이 묶입니다.'
       ],
-      tip: '초기 중심 위치가 다르면 최종 군집 결과도 달라질 수 있으므로 여러 번 초기화해 비교해보세요.'
+      tip: '처음 중심은 마음대로 정해도 되지만, 결과는 중심 위치에 따라 달라질 수 있습니다.'
     },
     tree: {
-      title: '의사결정트리는 질문을 순서대로 던집니다.',
+      title: '의사결정트리를 쉽게 따라가 볼까요?',
       steps: [
-        '1. 처음 분할선은 데이터의 X축 또는 Y축 기준으로 정해집니다.',
-        '2. 분할된 영역을 다시 나누면 트리의 깊이가 깊어집니다.',
-        '3. 깊이가 커질수록 영역이 더 세분화되어 과대적합 위험이 커질 수 있습니다.'
+        '1. 처음 질문은 X값이나 Y값을 기준으로 나누는 규칙입니다.',
+        '2. 한 번 나눈 영역을 다시 나누면 트리가 깊어집니다.',
+        '3. 깊이가 깊어질수록 더 세밀하게 나뉘지만, 너무 복잡해질 수도 있습니다.'
       ],
-      tip: '트리의 질문은 “특정 값보다 큰가?”와 같은 조건이며, 불순도가 줄어드는 방향으로 선택됩니다.'
+      tip: '트리는 질문을 여러 번 하면서 답을 찾아가는 구조입니다. 질문을 순서대로 따라가면 결과를 이해할 수 있습니다.'
     },
     svm: {
-      title: 'SVM은 두 클래스 사이의 여백을 최대화합니다.',
+      title: 'SVM을 쉽게 따라가 볼까요?',
       steps: [
-        '1. 마진 폭을 늘리거나 줄이면 경계와 각 클래스 사이의 공간이 달라집니다.',
-        '2. 경계 기울기를 바꾸면 분류 경계가 회전합니다.',
-        '3. 금색으로 강조된 점은 경계 가까운 서포트 벡터이며, 빨간 테두리는 잘못 분류된 점입니다.'
+        '1. 마진은 두 그룹 사이의 빈 공간입니다. 마진이 넓을수록 경계가 안정적이라고 생각하면 됩니다.',
+        '2. 경계 기울기를 바꾸면 분류 선이 회전합니다.',
+        '3. 금색으로 강조된 점은 경계 가까이에 있는 점이고, 빨간 테두리는 잘못 분류된 점입니다.'
       ],
-      tip: 'SVM은 경계에서 가장 가까운 데이터와의 거리인 마진을 최대화해 새로운 데이터에도 안정적인 결정을 만들려 합니다.'
+      tip: 'SVM은 두 그룹 사이에 가능한 한 많은 공간을 남기는 경계를 찾는다고 생각하면 됩니다.'
     }
   };
   const guide = guides[type];
@@ -279,14 +279,14 @@ function simulatorGuide(type) {
 }
 function simulatorTemplate(type) {
   const controls = {
-    linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', false)}<div class="prediction-control"><label for="linear-predict">예측할 X</label><input id="linear-predict" type="number" min="0" max="10" step="0.1" value="5"><strong id="linear-prediction">-</strong></div><button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
-    logistic: `${control('기울기', 'logistic-slope-value', 'logistic-slope')}${control('절편', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준', 'logistic-threshold-value', 'logistic-threshold')}${dataEntry('logistic', true)}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
-    knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}${dataEntry('knn', true)}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
-    kmeans: `${control('클러스터 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}${dataEntry('kmeans', false)}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
-    tree: `${control('최대 깊이', 'tree-depth-value', 'tree-depth')}${dataEntry('tree', true)}<button class="action-button" onclick="resetTree()">샘플 재생성</button>`,
-    svm: `${control('마진 폭', 'svm-margin-value', 'svm-margin')}${control('경계 기울기', 'svm-angle-value', 'svm-angle')}${dataEntry('svm', true)}<button class="action-button" onclick="resetSvm()">점 초기화</button>`
+    linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', false)}<div class="prediction-control"><label for="linear-predict">예측할 X값</label><input id="linear-predict" type="number" min="0" max="10" step="0.1" value="5"><strong id="linear-prediction">-</strong></div><button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
+    logistic: `${control('경계가 가파른 정도', 'logistic-slope-value', 'logistic-slope')}${control('경계의 높이', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준(확률)', 'logistic-threshold-value', 'logistic-threshold')}${dataEntry('logistic', true)}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
+    knn: `${control('참고할 이웃 수 K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('한 그룹의 점 수', 'knn-count-value', 'knn-count')}${dataEntry('knn', true)}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
+    kmeans: `${control('묶을 그룹 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}${dataEntry('kmeans', false)}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
+    tree: `${control('질문을 몇 번 할까요?', 'tree-depth-value', 'tree-depth')}${dataEntry('tree', true)}<button class="action-button" onclick="resetTree()">샘플 재생성</button>`,
+    svm: `${control('두 그룹 사이 공간', 'svm-margin-value', 'svm-margin')}${control('경계의 기울기', 'svm-angle-value', 'svm-angle')}${dataEntry('svm', true)}<button class="action-button" onclick="resetSvm()">점 초기화</button>`
   }[type];
-  const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['가장 가까운 이웃|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], tree: ['트리 깊이|tree-depth-result', '분할선 수|tree-splits', '평균 지니|tree-gini'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
+  const metrics = { linear: ['직선 식|linear-equation', '점과 직선의 차이|linear-mse', '데이터 수|linear-status'], logistic: ['경계 위치|logistic-boundary', '맞춘 비율|logistic-accuracy', '사용한 기준|logistic-result'], knn: ['참고한 이웃|knn-neighbors', '결정된 그룹|knn-result', '표 결과|knn-votes'], kmeans: ['학습 횟수|kmeans-step', '그룹 수|kmeans-result', '현재 상태|kmeans-status'], tree: ['질문 단계|tree-depth-result', '나눈 영역|tree-splits', '한 영역의 혼잡도|tree-gini'], svm: ['경계 근처 점|svm-support', '틀린 점|svm-errors', '두 그룹 사이 공간|svm-result'] }[type];
   const metricHtml = metrics.map(value => { const [label, id] = value.split('|'); return `<div class="metric"><small>${label}</small><strong id="${id}">-</strong></div>`; }).join('');
   return `<div class="simulator-grid"><aside class="control-panel"><h3>실험 조절판</h3>${controls}</aside><section><div class="canvas-wrap"><canvas id="${type}-canvas" aria-label="${algorithms[type].title} 시뮬레이터"></canvas><div class="canvas-note">캔버스의 점을 드래그하며 변화를 관찰하세요.</div></div>${simulatorGuide(type)}<div class="metrics">${metricHtml}</div><div id="${type}-learning" class="learning-panel"></div></section></div>`;
 }
@@ -390,10 +390,10 @@ function initLinear() {
     let mse = 0; points.forEach((point, index) => { const dataPoint = dataPoints[index]; const predicted = slope * dataPoint.x + intercept; const predictedY = screenY(predicted); mse += (dataPoint.y - predicted) ** 2; sim.ctx.strokeStyle = '#aeb8c4'; sim.ctx.lineWidth = 1; sim.ctx.setLineDash([4, 4]); sim.ctx.beginPath(); sim.ctx.moveTo(point.x, point.y); sim.ctx.lineTo(point.x, predictedY); sim.ctx.stroke(); sim.ctx.setLineDash([]); sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); });
     const predictionX = +get('linear-predict').value; const predictionY = slope * predictionX + intercept; get('linear-prediction').textContent = Number.isFinite(predictionX) ? `예측 Y = ${predictionY.toFixed(2)}` : 'X값을 입력하세요'; get('linear-equation').textContent = `y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`; get('linear-mse').textContent = (mse / count).toFixed(2); get('linear-status').textContent = `${count}개 데이터`;
     renderStepList('linear-learning', '단계별 변화', [
-      `1단계: 평균 x값 ${meanX.toFixed(2)}와 평균 y값 ${meanY.toFixed(2)}를 계산합니다.`,
-      `2단계: 기울기 ${slope.toFixed(2)}를 이용해 직선의 기울기를 갱신합니다.`,
-      `3단계: 절편 ${intercept.toFixed(2)}을 적용해 회귀선을 그립니다.`,
-      `4단계: 잔차의 제곱합을 합산해 MSE ${(mse / count).toFixed(2)}를 확인합니다.`
+      `1단계: 점들의 평균 위치를 계산합니다.`,
+      `2단계: 직선이 얼마나 올라가거나 내려가는지 ${slope.toFixed(2)}로 정합니다.`,
+      `3단계: 직선을 위아래로 ${intercept.toFixed(2)}만큼 움직여 가장 자연스러운 선을 만듭니다.`,
+      `4단계: 각 점과 직선 사이의 차이를 비교해 오차를 확인합니다.`
     ]);
     const coordinateText = get('linear-coordinate');
     if (!coordinateText) {
@@ -413,10 +413,10 @@ function initLogistic() {
   const drawSigmoid = (threshold) => { sigmoid.ctx.clearRect(0, 0, sigmoid.width, sigmoid.height); sigmoid.ctx.strokeStyle = '#e5e1d8'; sigmoid.ctx.beginPath(); sigmoid.ctx.moveTo(28, sigmoid.height - 24); sigmoid.ctx.lineTo(sigmoid.width - 8, sigmoid.height - 24); sigmoid.ctx.moveTo(28, 12); sigmoid.ctx.lineTo(28, sigmoid.height - 24); sigmoid.ctx.stroke(); sigmoid.ctx.strokeStyle = '#ea6048'; sigmoid.ctx.lineWidth = 3; sigmoid.ctx.beginPath(); for (let index = 0; index <= 100; index++) { const z = -6 + index / 100 * 12; const probability = 1 / (1 + Math.exp(-z)); const x = 28 + index / 100 * (sigmoid.width - 36); const y = sigmoid.height - 24 - probability * (sigmoid.height - 42); if (index === 0) sigmoid.ctx.moveTo(x, y); else sigmoid.ctx.lineTo(x, y); } sigmoid.ctx.stroke(); const thresholdY = sigmoid.height - 24 - threshold * (sigmoid.height - 42); sigmoid.ctx.strokeStyle = '#7357c8'; sigmoid.ctx.setLineDash([5, 4]); sigmoid.ctx.beginPath(); sigmoid.ctx.moveTo(28, thresholdY); sigmoid.ctx.lineTo(sigmoid.width - 8, thresholdY); sigmoid.ctx.stroke(); sigmoid.ctx.setLineDash([]); };
   const draw = () => { const slope = +get('logistic-slope').value; const bias = +get('logistic-bias').value; const threshold = +get('logistic-threshold').value; const logit = Math.log(threshold / (1 - threshold)); const boundary = Math.abs(slope) < 0.001 ? sim.height / 2 : sim.height - ((logit - bias) / slope) * sim.height; sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height); sim.ctx.strokeStyle = '#ea6048'; sim.ctx.setLineDash([7, 5]); sim.ctx.beginPath(); sim.ctx.moveTo(0, boundary); sim.ctx.lineTo(sim.width, boundary); sim.ctx.stroke(); sim.ctx.setLineDash([]); let correct = 0; let probabilityTotal = 0; points.forEach(point => { const probability = 1 / (1 + Math.exp(-(slope * (sim.height - point.y) / sim.height + bias))); probabilityTotal += probability; if ((probability >= threshold ? 1 : 0) === point.label) correct++; sim.ctx.fillStyle = point.label ? '#ea6048' : '#2563eb'; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 7, 0, Math.PI * 2); sim.ctx.fill(); }); drawSigmoid(threshold); get('logistic-boundary').textContent = `y = ${boundary.toFixed(0)}`; get('logistic-accuracy').textContent = `${Math.round(correct / points.length * 100)}%`; get('logistic-result').textContent = threshold.toFixed(2); get('logistic-learning-text').textContent = `기준 확률 ${threshold.toFixed(2)} · 평균 예측 확률 ${(probabilityTotal / points.length).toFixed(2)} · 점선은 결정 경계입니다.`;
     renderStepList('logistic-learning', '단계별 변화', [
-      `1단계: 선형 결합 z = ${slope.toFixed(2)}x + ${bias.toFixed(2)}로 입력값을 변환합니다.`,
-      `2단계: 시그모이드 함수로 확률을 계산해 ${threshold.toFixed(2)} 기준으로 분류합니다.`,
-      `3단계: 결정 경계가 ${boundary.toFixed(0)} 위치로 이동하며 클래스가 바뀝니다.`,
-      `4단계: 분류 정확도 ${Math.round(correct / points.length * 100)}%를 확인합니다.`
+      `1단계: 입력값을 ${slope.toFixed(2)}와 ${bias.toFixed(2)}를 이용해 계산합니다.`,
+      `2단계: 계산 결과를 확률로 바꾸고 ${threshold.toFixed(2)}보다 높은지 낮은지로 판단합니다.`,
+      `3단계: 경계가 ${boundary.toFixed(0)} 위치로 움직여서 점이 다른 그룹으로 바뀔 수 있습니다.`,
+      `4단계: 몇 개의 점을 정확히 맞췄는지 ${Math.round(correct / points.length * 100)}%로 확인합니다.`
     ]);
   };
   const generate = () => { points.length = 0; const entered = parseInput('logistic', sim.width, sim.height, true); if (entered) { points.push(...entered); draw(); return; } const pattern = randomChoice(['balanced', 'upper-heavy', 'overlap']); const threshold = randomBetween(.38, .62); for (let index = 0; index < 24; index++) { const label = index % 2; const spread = pattern === 'overlap' ? .2 : pattern === 'upper-heavy' ? .12 : .08; const base = label ? threshold - .18 : threshold + .18; const yRatio = clamp(base + randomNormal(0, spread), .06, .94); points.push({ x: randomBetween(40, sim.width - 40), y: sim.height * yRatio, label }); } draw(); };
@@ -428,9 +428,9 @@ function initKnn() {
   get('knn-learning').innerHTML = '<strong>가까운 이웃 거리 순위</strong><ol id="knn-distance-list"></ol>';
   const draw = () => { const k = +get('knn-k').value; sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height); const neighbors = points.map(point => ({ ...point, distance: Math.hypot((point.x - target.x) / sim.width * 100, (point.y - target.y) / sim.height * 100) })).sort((a, b) => a.distance - b.distance).slice(0, k); const votes = {}; neighbors.forEach(point => { votes[point.group] = (votes[point.group] || 0) + 1; }); const winner = +(Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0] || 0); points.forEach(point => { sim.ctx.fillStyle = colors[point.group]; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); }); neighbors.forEach((point, index) => { sim.ctx.strokeStyle = '#7357c8'; sim.ctx.beginPath(); sim.ctx.moveTo(target.x, target.y); sim.ctx.lineTo(point.x, point.y); sim.ctx.stroke(); sim.ctx.fillStyle = '#7357c8'; sim.ctx.font = 'bold 12px sans-serif'; sim.ctx.fillText(`${index + 1}`, point.x + 8, point.y - 8); }); sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(target.x, target.y, 11, 0, Math.PI * 2); sim.ctx.fill(); get('knn-neighbors').textContent = `${k}개`; get('knn-result').textContent = `그룹 ${winner + 1}`; get('knn-votes').textContent = Object.entries(votes).map(([group, vote]) => `${+group + 1}번 ${vote}표`).join(' / '); get('knn-distance-list').innerHTML = neighbors.map((point, index) => `<li>${index + 1}위 · 그룹 ${point.group + 1} · 거리 ${point.distance.toFixed(1)}</li>`).join('');
     renderStepList('knn-learning', '단계별 변화', [
-      `1단계: 타깃 점과 각 샘플 사이의 거리를 계산합니다.`,
-      `2단계: 가장 가까운 ${k}개 이웃을 선택합니다.`,
-      `3단계: 각 그룹의 득표 수를 비교해 최종 그룹 ${winner + 1}로 결정합니다.`
+      `1단계: 타깃 점과 가까운 정도를 각각 계산합니다.`,
+      `2단계: 가장 가까운 ${k}개 점을 골라 봅니다.`,
+      `3단계: 어떤 그룹이 더 많이 선택됐는지 비교해 최종 그룹 ${winner + 1}로 결정합니다.`
     ]);
   };
   const generate = () => { points.length = 0; const entered = parseInput('knn', sim.width, sim.height, true); if (entered) { points.push(...entered); draw(); return; } const groups = +get('knn-groups').value; const count = +get('knn-count').value; const layout = randomChoice(['corners', 'diagonal', 'center']); const centers = Array.from({ length: groups }, (_, group) => layout === 'corners' ? { x: sim.width * (group % 2 ? .72 : .28), y: sim.height * (group < 2 ? .3 : .72) } : layout === 'diagonal' ? { x: sim.width * (.2 + group / Math.max(groups - 1, 1) * .6), y: sim.height * (.75 - group / Math.max(groups - 1, 1) * .5) } : { x: randomBetween(sim.width * .2, sim.width * .8), y: randomBetween(sim.height * .2, sim.height * .8) }); for (let group = 0; group < groups; group++) for (let index = 0; index < count; index++) points.push({ x: clamp(centers[group].x + randomNormal(0, 55), 12, sim.width - 12), y: clamp(centers[group].y + randomNormal(0, 48), 12, sim.height - 12), group }); draw(); };
@@ -443,9 +443,9 @@ function initKmeans() {
   let previousCenters = [];
   const draw = () => { sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height); points.forEach(point => { sim.ctx.fillStyle = colors[point.cluster % colors.length]; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); }); previousCenters.forEach((center, index) => { if (!centers[index]) return; sim.ctx.strokeStyle = colors[index]; sim.ctx.setLineDash([5, 4]); sim.ctx.beginPath(); sim.ctx.moveTo(center.x, center.y); sim.ctx.lineTo(centers[index].x, centers[index].y); sim.ctx.stroke(); sim.ctx.setLineDash([]); }); centers.forEach((center, index) => { sim.ctx.strokeStyle = colors[index]; sim.ctx.lineWidth = 4; sim.ctx.beginPath(); sim.ctx.arc(center.x, center.y, 12, 0, Math.PI * 2); sim.ctx.stroke(); }); const clusterStats = centers.map((center, index) => { const clusterPoints = points.filter(point => point.cluster === index); const error = clusterPoints.reduce((sum, point) => sum + Math.hypot(point.x - center.x, point.y - center.y) ** 2, 0); return { count: clusterPoints.length, error }; }); const totalError = clusterStats.reduce((sum, stat) => sum + stat.error, 0); get('kmeans-result').textContent = `${centers.length}개`; get('kmeans-learning-text').textContent = `점 할당 후 각 그룹의 평균 위치로 중심을 이동합니다. WCSS ${totalError.toFixed(0)}`; get('kmeans-cluster-list').innerHTML = clusterStats.map((stat, index) => `<li>클러스터 ${index + 1}: ${stat.count}개 · 오차 ${stat.error.toFixed(0)}</li>`).join('');
     renderStepList('kmeans-learning', '단계별 변화', [
-      `1단계: 각 점을 가장 가까운 중심에 할당합니다.`,
-      `2단계: 각 군집의 평균 위치를 계산해 중심을 이동합니다.`,
-      `3단계: WCSS ${totalError.toFixed(0)} 값이 줄어드는지 확인하며 반복합니다.`
+      `1단계: 각 점을 가장 가까운 중심에 넣습니다.`,
+      `2단계: 각 그룹의 가운데 위치를 다시 계산해 중심을 움직입니다.`,
+      `3단계: 중심이 더 이상 크게 움직이지 않을 때까지 반복합니다.`
     ]);
   };
   const generate = () => { points.length = 0; centers.length = 0; previousCenters = []; const clusterCount = +get('kmeans-k').value; const entered = parseInput('kmeans', sim.width, sim.height, false); if (entered) points.push(...entered.map((point, index) => ({ ...point, cluster: index % clusterCount }))); else { const count = +get('kmeans-count').value; const layout = randomChoice(['spread', 'diagonal', 'compact']); const sourceCenters = Array.from({ length: clusterCount }, (_, cluster) => layout === 'spread' ? { x: sim.width * (.18 + cluster % 3 * .32), y: sim.height * (.25 + Math.floor(cluster / 3) * .45) } : layout === 'diagonal' ? { x: sim.width * (.18 + cluster / Math.max(clusterCount - 1, 1) * .64), y: sim.height * (.75 - cluster / Math.max(clusterCount - 1, 1) * .5) } : { x: randomBetween(sim.width * .3, sim.width * .7), y: randomBetween(sim.height * .3, sim.height * .7) }); for (let index = 0; index < count; index++) { const cluster = index % clusterCount; points.push({ x: clamp(sourceCenters[cluster].x + randomNormal(0, layout === 'compact' ? 75 : 45), 12, sim.width - 12), y: clamp(sourceCenters[cluster].y + randomNormal(0, layout === 'compact' ? 65 : 40), 12, sim.height - 12), cluster }); } } for (let index = 0; index < clusterCount; index++) centers.push({ x: randomBetween(50, sim.width - 50), y: randomBetween(50, sim.height - 50) }); get('kmeans-step').textContent = '0'; get('kmeans-status').textContent = '초기화됨'; draw(); };
@@ -503,9 +503,9 @@ function initTree() {
     get('tree-gini').textContent = gini(points).toFixed(2);
     get('tree-rule-list').innerHTML = rules.map(rule => `<li>${rule}</li>`).join('');
     renderStepList('tree-learning', '단계별 변화', [
-      `1단계: 최적 분할 기준 ${rootX.toFixed(0)}을 찾습니다.`,
-      `2단계: X 축 기준으로 왼쪽/오른쪽 영역을 나눕니다.`,
-      `3단계: 깊이가 ${depth}인 경우 추가 분할을 수행해 불순도를 줄입니다.`
+      `1단계: 점들을 잘 나누는 기준 ${rootX.toFixed(0)}을 찾습니다.`,
+      `2단계: X값 기준으로 왼쪽과 오른쪽 영역을 나눕니다.`,
+      `3단계: 질문을 더 많이 하면 점들이 더 잘 분류될 수 있지만, 너무 복잡해질 수도 있습니다.`
     ]);
   };
   const generate = () => { points.length = 0; const entered = parseInput('tree', sim.width, sim.height, true); if (entered) { points.push(...entered); draw(); return; } const pattern = randomChoice(['quadrant', 'diagonal', 'horizontal', 'circle']); for (let index = 0; index < 36; index++) { const x = randomBetween(30, sim.width - 30); const y = randomBetween(30, sim.height - 30); const nx = x / sim.width; const ny = y / sim.height; const label = pattern === 'quadrant' ? (nx > .5) !== (ny > .5) ? 1 : 0 : pattern === 'diagonal' ? ny < nx ? 1 : 0 : pattern === 'horizontal' ? ny < .5 ? 1 : 0 : Math.hypot(nx - .5, ny - .5) < .28 ? 1 : 0; points.push({ x, y, label }); } draw(); };
