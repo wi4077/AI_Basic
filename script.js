@@ -207,18 +207,88 @@ function dataEntry(type, needsLabel) {
   const rows = Array.from({ length: 4 }, () => `<tr class="data-row"><td><input data-field="x" type="number" min="0" max="${coordinateMax}" placeholder="x"></td><td><input data-field="y" type="number" min="0" max="${coordinateMax}" placeholder="y"></td>${needsLabel ? '<td><input data-field="label" type="number" placeholder="0/1"></td>' : ''}</tr>`).join('');
   return `<div class="data-entry"><label>직접 데이터 입력 <span>X, Y 입력 범위: 0~${coordinateMax}</span></label><div class="data-table-wrap"><table><thead><tr><th>X</th><th>Y</th>${labelHeader}</tr></thead><tbody id="${type}-data-rows">${rows}</tbody></table></div><div class="data-actions"><button class="action-button" onclick="addDataRow('${type}', ${needsLabel})">행 추가</button><button class="action-button" onclick="applyInput('${type}')">입력 적용</button><button class="action-button" onclick="randomizeData('${type}')">랜덤 데이터</button></div></div>`;
 }
+function simulatorGuide(type) {
+  const guides = {
+    linear: {
+      title: '선형 회귀는 무엇을 보나요?',
+      steps: [
+        '1. 데이터 점을 보고 전체적으로 올라가는지, 내려가는지 확인하세요.',
+        '2. 잡음 정도를 바꾸면 회귀선이 왜 흔들리는지 관찰하세요.',
+        '3. X값을 입력하면 직선 위의 예측값이 어떻게 계산되는지 확인하세요.'
+      ],
+      tip: '직선은 데이터의 평균 관계를 요약한 것으로, 각 점까지의 거리를 줄이는 방향으로 만들어집니다.'
+    },
+    logistic: {
+      title: '로지스틱 회귀는 어떻게 분류하나요?',
+      steps: [
+        '1. 기울기는 경계선이 얼마나 기울어지는지 조절합니다. 값이 크면 경계가 급격하게 변합니다.',
+        '2. 절편은 경계가 화면 위아래로 이동하도록 만듭니다. 점이 얼마나 쉽게 분류되는지도 바뀝니다.',
+        '3. 기준값은 0~1 사이의 확률 중 어느 수준을 기준으로 클래스를 정할지 결정합니다. 예를 들어 0.50은 절반 이상일 때 1로 분류합니다.',
+        '4. 점선은 기준값에 따라 만들어지는 결정 경계입니다. 점이 경계 아래면 하나의 클래스, 위면 다른 클래스가 됩니다.'
+      ],
+      tip: '확률은 시그모이드 함수에 값을 넣어 계산합니다. 출력값이 기준값보다 크면 해당 클래스, 작으면 다른 클래스로 판단합니다.'
+    },
+    knn: {
+      title: 'KNN은 가까운 이웃을 기준으로 판단합니다.',
+      steps: [
+        '1. 보라색 타깃 점을 드래그해 주변 데이터의 변화를 확인하세요.',
+        '2. K 값을 크게 하면 많은 이웃을 함께 보므로 경계가 부드러워집니다.',
+        '3. 거리 순위와 투표 결과를 비교해 어떤 이웃이 분류에 영향을 주는지 확인하세요.'
+      ],
+      tip: 'KNN은 매번 새로운 데이터에 대해 거리를 다시 계산하므로, K 값이 클수록 주변 패턴을 넓게 반영합니다.'
+    },
+    kmeans: {
+      title: 'K-평균은 중심을 반복해서 움직입니다.',
+      steps: [
+        '1. 한 단계 학습을 누르면 모든 점을 가장 가까운 중심에 할당합니다.',
+        '2. 각 군집의 평균 위치가 중심으로 다시 계산됩니다.',
+        '3. 중심이 더 이상 크게 움직이지 않을 때까지 반복해 비슷한 점들을 묶습니다.'
+      ],
+      tip: '초기 중심 위치가 다르면 최종 군집 결과도 달라질 수 있으므로 여러 번 초기화해 비교해보세요.'
+    },
+    tree: {
+      title: '의사결정트리는 질문을 순서대로 던집니다.',
+      steps: [
+        '1. 처음 분할선은 데이터의 X축 또는 Y축 기준으로 정해집니다.',
+        '2. 분할된 영역을 다시 나누면 트리의 깊이가 깊어집니다.',
+        '3. 깊이가 커질수록 영역이 더 세분화되어 과대적합 위험이 커질 수 있습니다.'
+      ],
+      tip: '트리의 질문은 “특정 값보다 큰가?”와 같은 조건이며, 불순도가 줄어드는 방향으로 선택됩니다.'
+    },
+    svm: {
+      title: 'SVM은 두 클래스 사이의 여백을 최대화합니다.',
+      steps: [
+        '1. 마진 폭을 늘리거나 줄이면 경계와 각 클래스 사이의 공간이 달라집니다.',
+        '2. 경계 기울기를 바꾸면 분류 경계가 회전합니다.',
+        '3. 금색으로 강조된 점은 경계 가까운 서포트 벡터이며, 빨간 테두리는 잘못 분류된 점입니다.'
+      ],
+      tip: 'SVM은 경계에서 가장 가까운 데이터와의 거리인 마진을 최대화해 새로운 데이터에도 안정적인 결정을 만들려 합니다.'
+    }
+  };
+  const guide = guides[type];
+  return `
+    <section class="simulator-guide" aria-label="${guide.title}">
+      <div class="guide-heading">
+        <span class="eyebrow">HOW TO USE</span>
+        <h3>${guide.title}</h3>
+      </div>
+      <ol>${guide.steps.map(step => `<li>${step}</li>`).join('')}</ol>
+      <p>${guide.tip}</p>
+    </section>
+  `;
+}
 function simulatorTemplate(type) {
   const controls = {
     linear: `${control('데이터 개수', 'linear-count-value', 'linear-count')}${control('잡음 정도', 'linear-noise-value', 'linear-noise')}${dataEntry('linear', false)}<div class="prediction-control"><label for="linear-predict">예측할 X</label><input id="linear-predict" type="number" min="0" max="10" step="0.1" value="5"><strong id="linear-prediction">-</strong></div><button class="action-button" onclick="resetLinear()">새 데이터 만들기</button>`,
     logistic: `${control('기울기', 'logistic-slope-value', 'logistic-slope')}${control('절편', 'logistic-bias-value', 'logistic-bias')}${control('분류 기준', 'logistic-threshold-value', 'logistic-threshold')}${dataEntry('logistic', true)}<button class="action-button" onclick="resetLogistic()">데이터 재생성</button>`,
-    knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}${dataEntry('knn', true)}<button class="action-button" onclick="findBestKnn()">최적 K 찾기</button><button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
+    knn: `${control('K', 'knn-k-value', 'knn-k')}${control('그룹 수', 'knn-groups-value', 'knn-groups')}${control('그룹별 점', 'knn-count-value', 'knn-count')}${dataEntry('knn', true)}<button class="action-button" onclick="resetKnn()">데이터 재생성</button>`,
     kmeans: `${control('클러스터 수 K', 'kmeans-k-value', 'kmeans-k')}${control('데이터 개수', 'kmeans-count-value', 'kmeans-count')}${dataEntry('kmeans', false)}<button class="action-button" onclick="resetKmeans()">초기화</button><button class="primary-button" onclick="stepKmeans()">한 단계 학습</button>`,
     tree: `${control('최대 깊이', 'tree-depth-value', 'tree-depth')}${dataEntry('tree', true)}<button class="action-button" onclick="resetTree()">샘플 재생성</button>`,
     svm: `${control('마진 폭', 'svm-margin-value', 'svm-margin')}${control('경계 기울기', 'svm-angle-value', 'svm-angle')}${dataEntry('svm', true)}<button class="action-button" onclick="resetSvm()">점 초기화</button>`
   }[type];
-  const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['검증 정확도|knn-validation', 'K 판정|knn-k-judgment', '이웃 수|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], tree: ['트리 깊이|tree-depth-result', '분할선 수|tree-splits', '평균 지니|tree-gini'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
+  const metrics = { linear: ['회귀식|linear-equation', '평균제곱오차|linear-mse', '데이터 상태|linear-status'], logistic: ['결정 경계|logistic-boundary', '분류 정확도|logistic-accuracy', '선택 기준|logistic-result'], knn: ['가장 가까운 이웃|knn-neighbors', '분류 결과|knn-result', '득표|knn-votes'], kmeans: ['반복 단계|kmeans-step', '군집 수|kmeans-result', '상태|kmeans-status'], tree: ['트리 깊이|tree-depth-result', '분할선 수|tree-splits', '평균 지니|tree-gini'], svm: ['서포트 벡터|svm-support', '침범 오류|svm-errors', '마진 폭|svm-result'] }[type];
   const metricHtml = metrics.map(value => { const [label, id] = value.split('|'); return `<div class="metric"><small>${label}</small><strong id="${id}">-</strong></div>`; }).join('');
-  return `<div class="simulator-grid"><aside class="control-panel"><h3>실험 조절판</h3>${controls}</aside><section><div class="canvas-wrap"><canvas id="${type}-canvas" aria-label="${algorithms[type].title} 시뮬레이터"></canvas><div class="canvas-note">캔버스의 점을 드래그하며 변화를 관찰하세요.</div></div><div class="metrics">${metricHtml}</div><div id="${type}-learning" class="learning-panel"></div></section></div>`;
+  return `<div class="simulator-grid"><aside class="control-panel"><h3>실험 조절판</h3>${controls}</aside><section><div class="canvas-wrap"><canvas id="${type}-canvas" aria-label="${algorithms[type].title} 시뮬레이터"></canvas><div class="canvas-note">캔버스의 점을 드래그하며 변화를 관찰하세요.</div></div>${simulatorGuide(type)}<div class="metrics">${metricHtml}</div><div id="${type}-learning" class="learning-panel"></div></section></div>`;
 }
 
 function setupCanvas(id, height = 430) {
@@ -356,85 +426,15 @@ function initLogistic() {
 function initKnn() {
   const sim = setupCanvas('knn-canvas'); const points = []; const target = { x: sim.width / 2, y: sim.height / 2 }; const colors = ['#0f8b8d', '#ea6048', '#7357c8', '#d28b2e'];
   get('knn-learning').innerHTML = '<strong>가까운 이웃 거리 순위</strong><ol id="knn-distance-list"></ol>';
-
-  const distanceToTarget = point => Math.hypot((point.x - target.x) / sim.width * 100, (point.y - target.y) / sim.height * 100);
-  const predictByK = (k, dataset = points) => {
-    if (!dataset.length || k < 1) return { winner: 0, votes: {}, neighbors: [] };
-    const neighbors = dataset.map(point => ({ ...point, distance: distanceToTarget(point) })).sort((a, b) => a.distance - b.distance).slice(0, Math.min(k, dataset.length));
-    const votes = {};
-    neighbors.forEach(point => { votes[point.group] = (votes[point.group] || 0) + 1; });
-    const sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
-    const winner = Number(sortedVotes[0]?.[0] ?? 0);
-    return { winner, votes, neighbors };
-  };
-  const evaluateK = k => {
-    if (!points.length) return { k, accuracy: 0 };
-    let correct = 0;
-    points.forEach((point, index) => {
-      const others = points.filter((_, otherIndex) => otherIndex !== index);
-      const predicted = predictByK(k, others).winner;
-      if (predicted === point.group) correct += 1;
-    });
-    return { k, accuracy: (correct / points.length) * 100 };
-  };
-  const findBestK = () => {
-    if (!points.length) return { k: 1, accuracy: 0 };
-    const candidateKs = Array.from({ length: Math.min(15, points.length) }, (_, index) => index + 1);
-    const scored = candidateKs.map(evaluateK).sort((a, b) => b.accuracy - a.accuracy || a.k - b.k);
-    return scored[0] || { k: 1, accuracy: 0 };
-  };
-  const judgeK = (selectedK, bestK, currentAccuracy) => {
-    if (!points.length) return '데이터가 없습니다.';
-    const candidateRange = Math.min(15, points.length);
-    const smallBoundary = Math.max(1, Math.min(3, Math.round(candidateRange * 0.25)));
-    const largeBoundary = Math.max(3, Math.round(candidateRange * 0.7));
-    const isNearBest = Math.abs(selectedK - bestK) <= 1;
-    const kMessage = `K=${selectedK}`;
-    const bestRangeStart = Math.max(1, bestK - 1);
-    const bestRangeEnd = Math.min(candidateRange, bestK + 1);
-    const bestRangeText = `현재 데이터에서 적절한 K는 보통 ${bestRangeStart}~${bestRangeEnd} 범위입니다.`;
-    if (isNearBest && currentAccuracy >= 60) return `${kMessage}은(는) 적정 K 값입니다. 이 데이터에서 가장 적절한 K 값이라서 적정 K 값으로 판단됩니다. 현재 검증 정확도 ${currentAccuracy.toFixed(0)}%입니다.`;
-    if (selectedK < bestK) return `${kMessage}은(는) 아직 작은 편입니다. K를 ${bestK}로 올리면 경계가 더 안정되어 적절한 K 범위에 가까워집니다.`;
-    if (selectedK > bestK) return `${kMessage}은(는) 큰 편입니다. K를 ${bestK}로 내리면 경계가 더 민감해져 적절한 K 범위에 가까워집니다.`;
-    if (selectedK <= smallBoundary) return `${kMessage}은(는) 과적합 상태입니다. K가 너무 작아 노이즈에 민감합니다.`;
-    if (selectedK >= largeBoundary) return `${kMessage}은(는) 과소적합 상태입니다. K가 너무 커서 경계가 지나치게 부드러워집니다.`;
-    return `${kMessage}은(는) 보통 수준입니다. ${bestRangeText} 더 조정해보면 더 좋은 경계를 찾을 수 있습니다.`;
-  };
-  const draw = () => {
-    const k = +get('knn-k').value;
-    const currentAccuracy = evaluateK(k).accuracy;
-    const best = findBestK();
-    const kJudgment = judgeK(k, best.k, currentAccuracy);
-    sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height);
-    const prediction = predictByK(k);
-    const { winner, votes, neighbors } = prediction;
-    points.forEach(point => { sim.ctx.fillStyle = colors[point.group]; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); });
-    neighbors.forEach((point, index) => { sim.ctx.strokeStyle = '#7357c8'; sim.ctx.beginPath(); sim.ctx.moveTo(target.x, target.y); sim.ctx.lineTo(point.x, point.y); sim.ctx.stroke(); sim.ctx.fillStyle = '#7357c8'; sim.ctx.font = 'bold 12px sans-serif'; sim.ctx.fillText(`${index + 1}`, point.x + 8, point.y - 8); });
-    sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(target.x, target.y, 11, 0, Math.PI * 2); sim.ctx.fill();
-    get('knn-neighbors').textContent = `${k}개`;
-    get('knn-validation').textContent = `${currentAccuracy.toFixed(0)}%`;
-    get('knn-k-judgment').textContent = kJudgment;
-    get('knn-result').textContent = `그룹 ${winner + 1}`;
-    get('knn-votes').textContent = Object.entries(votes).map(([group, vote]) => `${+group + 1}번 ${vote}표`).join(' / ');
-    get('knn-distance-list').innerHTML = neighbors.map((point, index) => `<li>${index + 1}위 · 그룹 ${point.group + 1} · 거리 ${point.distance.toFixed(1)}</li>`).join('');
-    const bestRangeStart = Math.max(1, best.k - 1);
-    const bestRangeEnd = Math.min(Math.min(15, points.length), best.k + 1);
+  const draw = () => { const k = +get('knn-k').value; sim.ctx.clearRect(0, 0, sim.width, sim.height); drawGrid(sim.ctx, sim.width, sim.height); const neighbors = points.map(point => ({ ...point, distance: Math.hypot((point.x - target.x) / sim.width * 100, (point.y - target.y) / sim.height * 100) })).sort((a, b) => a.distance - b.distance).slice(0, k); const votes = {}; neighbors.forEach(point => { votes[point.group] = (votes[point.group] || 0) + 1; }); const winner = +(Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0] || 0); points.forEach(point => { sim.ctx.fillStyle = colors[point.group]; sim.ctx.beginPath(); sim.ctx.arc(point.x, point.y, 6, 0, Math.PI * 2); sim.ctx.fill(); }); neighbors.forEach((point, index) => { sim.ctx.strokeStyle = '#7357c8'; sim.ctx.beginPath(); sim.ctx.moveTo(target.x, target.y); sim.ctx.lineTo(point.x, point.y); sim.ctx.stroke(); sim.ctx.fillStyle = '#7357c8'; sim.ctx.font = 'bold 12px sans-serif'; sim.ctx.fillText(`${index + 1}`, point.x + 8, point.y - 8); }); sim.ctx.fillStyle = '#17202a'; sim.ctx.beginPath(); sim.ctx.arc(target.x, target.y, 11, 0, Math.PI * 2); sim.ctx.fill(); get('knn-neighbors').textContent = `${k}개`; get('knn-result').textContent = `그룹 ${winner + 1}`; get('knn-votes').textContent = Object.entries(votes).map(([group, vote]) => `${+group + 1}번 ${vote}표`).join(' / '); get('knn-distance-list').innerHTML = neighbors.map((point, index) => `<li>${index + 1}위 · 그룹 ${point.group + 1} · 거리 ${point.distance.toFixed(1)}</li>`).join('');
     renderStepList('knn-learning', '단계별 변화', [
-      `1단계: 후보 K 값 1~${Math.min(15, points.length)}를 검증하고 각 K의 정확도를 계산합니다.`,
-      `2단계: 현재 K = ${k}의 검증 정확도는 ${currentAccuracy.toFixed(0)}%입니다.`,
-      `3단계: ${kJudgment}`,
-      `4단계: 이 데이터에서 적절한 K 범위는 ${bestRangeStart}~${bestRangeEnd}입니다. K를 1씩 조정해보면 경계가 어디서 안정적으로 바뀌는지 확인할 수 있습니다.`
+      `1단계: 타깃 점과 각 샘플 사이의 거리를 계산합니다.`,
+      `2단계: 가장 가까운 ${k}개 이웃을 선택합니다.`,
+      `3단계: 각 그룹의 득표 수를 비교해 최종 그룹 ${winner + 1}로 결정합니다.`
     ]);
   };
   const generate = () => { points.length = 0; const entered = parseInput('knn', sim.width, sim.height, true); if (entered) { points.push(...entered); draw(); return; } const groups = +get('knn-groups').value; const count = +get('knn-count').value; const layout = randomChoice(['corners', 'diagonal', 'center']); const centers = Array.from({ length: groups }, (_, group) => layout === 'corners' ? { x: sim.width * (group % 2 ? .72 : .28), y: sim.height * (group < 2 ? .3 : .72) } : layout === 'diagonal' ? { x: sim.width * (.2 + group / Math.max(groups - 1, 1) * .6), y: sim.height * (.75 - group / Math.max(groups - 1, 1) * .5) } : { x: randomBetween(sim.width * .2, sim.width * .8), y: randomBetween(sim.height * .2, sim.height * .8) }); for (let group = 0; group < groups; group++) for (let index = 0; index < count; index++) points.push({ x: clamp(centers[group].x + randomNormal(0, 55), 12, sim.width - 12), y: clamp(centers[group].y + randomNormal(0, 48), 12, sim.height - 12), group }); draw(); };
-  window.findBestKnn = () => {
-    const best = findBestK();
-    if (!best || !Number.isFinite(best.k)) return;
-    get('knn-k').value = best.k;
-    get('knn-k-value').textContent = best.k;
-    draw();
-  };
-  configureSlider('knn-k', 1, 15, 3, 1, 'knn-k-value', value => value, draw); configureSlider('knn-groups', 2, 4, 2, 1, 'knn-groups-value', value => value, generate); configureSlider('knn-count', 6, 24, 12, 1, 'knn-count-value', value => value, generate); draggable(sim.canvas, [target], draw); generate();
+  configureSlider('knn-k', 1, 15, 3, 2, 'knn-k-value', value => value, draw); configureSlider('knn-groups', 2, 4, 2, 1, 'knn-groups-value', value => value, generate); configureSlider('knn-count', 6, 24, 12, 1, 'knn-count-value', value => value, generate); draggable(sim.canvas, [target], draw); generate();
 }
 
 function initKmeans() {
